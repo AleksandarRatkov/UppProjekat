@@ -1,0 +1,8 @@
+eclipse.preferences.version=1
+encoding//src/main/java/activiti/spring/javnaNabavka/springweb/controllers/ApplicationController.java=UTF-8
+encoding//src/main/webapp/WEB-INF/views/application/executeTask.jsp=UTF-8
+encoding//src/main/webapp/WEB-INF/views/application/formiranjeKomisije.jsp=UTF-8
+encoding//src/main/webapp/WEB-INF/views/application/navbar.jsp=UTF-8
+encoding//src/main/webapp/WEB-INF/views/application/tasksList.jsp=UTF-8
+encoding//src/main/webapp/WEB-INF/views/application/welcome.jsp=UTF-8
+encoding//src/main/webapp/WEB-INF/views/login.jsp=UTF-8
