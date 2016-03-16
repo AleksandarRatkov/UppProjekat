@@ -4,18 +4,38 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+
 @Entity
 public class Prijava {
 
 	@Id
 	@GeneratedValue
 	private Long id;
+	private String user;
 	private String nazivPodnosiocaPrijave;
 	private String adresaPodnosiocaPrijave;
 	private String emailPodnosiocaPrijave;
 	
 	public Prijava() {
 		super();
+	}
+
+	public Prijava(String nazivPodnosiocaPrijave,String user, String adresaPodnosiocaPrijave, String emailPodnosiocaPrijave) {
+		super();
+		this.nazivPodnosiocaPrijave = nazivPodnosiocaPrijave;
+		this.user = user;
+		this.adresaPodnosiocaPrijave = adresaPodnosiocaPrijave;
+		this.emailPodnosiocaPrijave = emailPodnosiocaPrijave;
+	}
+	
+	
+
+	public String getString() {
+		return user;
+	}
+
+	public void setString(String user) {
+		this.user = user;
 	}
 
 	public Prijava(String nazivPodnosiocaPrijave, String adresaPodnosiocaPrijave, String emailPodnosiocaPrijave) {

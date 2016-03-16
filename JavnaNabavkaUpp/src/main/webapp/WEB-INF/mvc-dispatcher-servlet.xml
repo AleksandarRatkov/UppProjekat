@@ -85,8 +85,8 @@
 
 	<bean id="myUserDetailsService"
 		class="activiti.spring.javnaNabavka.springweb.services.ActivitiUserDetailService" />
-	<bean id="SacuvajPrijavuService"
-		class="activiti.spring.javnaNabavka.springweb.persistence.services.SacuvajPrijavuService" />
+	<bean id="RadSaPrijavamaService"
+		class="activiti.spring.javnaNabavka.springweb.persistence.services.RadSaPrijavamaService" />
 	<bean id="SastavljanjeClanovaKomisijeServis"
 		class="activiti.spring.javnaNabavka.springweb.services.SastavljanjeClanovaKomisijeServis" />
 	<bean id="PripremaResenjaZaKomisiju"
