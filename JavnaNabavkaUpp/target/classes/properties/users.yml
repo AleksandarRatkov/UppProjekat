@@ -1,0 +1,65 @@
+id: pera
+firstName: Petar
+lastName: Petrovic
+email: pera@something.com
+password: pera
+groups:
+ - id: narucilac
+---
+id: zika
+firstName: Zika
+lastName: Zikic
+email: zika@something.com
+password: zika
+groups:
+ - id: narucilac
+---
+
+id: mika
+firstName: Mika
+lastName: Mikic
+email: mika@localhost.com
+password: mika
+groups:
+ - id: ponudjac
+---
+
+id: luka
+firstName: Luka
+lastName: Lukic
+email: luka@localhost.com
+password: luka
+groups:
+ - id: ponudjac
+---
+id: aca
+firstName: Aca
+lastName: Ivanovic
+email: ivan@localhost.com
+password: aca
+groups:
+ - id: stranoLice
+---
+id: ceki
+firstName: Ceki
+lastName: Jovanovic
+email: ceki@localhost.com
+password: ceki
+groups:
+ - id: stranoLice
+---
+id: joca
+firstName: Joca
+lastName: Stefanovic
+email: joca@localhost.com
+password: joca
+groups:
+ - id: liceSaDrugimStepenomObrazovanja
+---
+id: mara
+firstName: Mara
+lastName: Markovic
+email: mara@something.com
+password: mara
+groups:
+ - id: liceSaDrugimStepenomObrazovanja

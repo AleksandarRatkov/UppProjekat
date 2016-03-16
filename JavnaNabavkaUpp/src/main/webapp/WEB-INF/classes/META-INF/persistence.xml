@@ -7,6 +7,7 @@ version="2.0">
 	<provider>org.hibernate.ejb.HibernatePersistence</provider>
 	<class>activiti.spring.javnaNabavka.enitity.JavnaNabavka</class>
 	<class>activiti.spring.javnaNabavka.enitity.PozivKvalifikacija</class>
+	<class>activiti.spring.javnaNabavka.enitity.Prijava</class>
 	<exclude-unlisted-classes>true</exclude-unlisted-classes>
 	<properties>
 		<property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5Dialect" />
