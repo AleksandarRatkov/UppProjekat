@@ -28,8 +28,9 @@ public class RadSaPrijavamaService {
 	
 	@SuppressWarnings("unchecked")
 	public ArrayList<Prijava> listaPrijavljenih(){
-		System.out.println("usao");
-		System.out.println( entityManager.createQuery("SELECT * FROM Prijava"));
-		return (ArrayList<Prijava>) entityManager.createQuery("SELECT * FROM Prijava");
+		
+		ArrayList<Prijava> prijave = (ArrayList<Prijava>) entityManager.createQuery("SELECT p FROM Prijava").getResultList();
+		System.out.println("Prijave su velicine: " + prijave.size());
+		return prijave;
 	}
 }
