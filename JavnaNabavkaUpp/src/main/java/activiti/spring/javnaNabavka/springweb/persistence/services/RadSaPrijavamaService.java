@@ -10,7 +10,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import activiti.spring.javnaNabavka.enitity.Prijava;
-@Service("SacuvajPrijavuService")
+@Service("RadSaPrijavamaService")
 public class RadSaPrijavamaService {
 
 	@PersistenceContext
@@ -26,10 +26,10 @@ public class RadSaPrijavamaService {
 		
 	}
 	
-	@SuppressWarnings("unchecked")
+	
 	public ArrayList<Prijava> listaPrijavljenih(){
-		
-		ArrayList<Prijava> prijave = (ArrayList<Prijava>) entityManager.createQuery("SELECT p FROM Prijava").getResultList();
+		@SuppressWarnings("unchecked")
+		ArrayList<Prijava> prijave = (ArrayList<Prijava>) entityManager.createQuery("SELECT p FROM Prijava p").getResultList();
 		System.out.println("Prijave su velicine: " + prijave.size());
 		return prijave;
 	}

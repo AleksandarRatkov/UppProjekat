@@ -7,18 +7,18 @@
     <startEvent id="startevent1" name="Start" activiti:initiator="${narucilac}" activiti:formKey="startForm"></startEvent>
     <userTask id="formiranjeOdlukeOPokretanju" name="Formiranje odluke o pokretanju postupka" activiti:candidateGroups="narucilac" activiti:formKey="executeTask">
       <extensionElements>
-        <activiti:formProperty id="nazivNarucioca" name="Naziv narucioca" type="string" variable="nazivNarucioca" required="true"></activiti:formProperty>
-        <activiti:formProperty id="adresaNarucioca" name="Adresa narucioca" type="string" variable="adresaNarucioca" required="true"></activiti:formProperty>
-        <activiti:formProperty id="rbrNabavke" name="Redni broj nabavke za tekucu godinu" type="long" variable="rbrNabavke" required="true"></activiti:formProperty>
-        <activiti:formProperty id="predmetNabavke" name="Predmet nabavke" type="string" variable="predmetNabavke" required="true"></activiti:formProperty>
-        <activiti:formProperty id="nazivIzOpstegRecnika" name="Naziv iz opsteg recnika" type="string" variable="nazivIzOpstegRecnika" required="true"></activiti:formProperty>
-        <activiti:formProperty id="oznakaIzOpstegRecnika" name="Oznaka iz opsteg recnika" type="string" variable="oznakaIzOpstegRecnika" required="true"></activiti:formProperty>
+        <activiti:formProperty id="nazivNarucioca" name="Naziv narucioca" type="string" variable="nazivNarucioca" default="Mercator" required="true"></activiti:formProperty>
+        <activiti:formProperty id="adresaNarucioca" name="Adresa narucioca" type="string" variable="adresaNarucioca" default="Cirpanova 12" required="true"></activiti:formProperty>
+        <activiti:formProperty id="rbrNabavke" name="Redni broj nabavke za tekucu godinu" type="long" variable="rbrNabavke" default="2" required="true"></activiti:formProperty>
+        <activiti:formProperty id="predmetNabavke" name="Predmet nabavke" type="string" variable="predmetNabavke" default="Kancelarijski namestaj" required="true"></activiti:formProperty>
+        <activiti:formProperty id="nazivIzOpstegRecnika" name="Naziv iz opsteg recnika" type="string" variable="nazivIzOpstegRecnika" default="Namestaj" required="true"></activiti:formProperty>
+        <activiti:formProperty id="oznakaIzOpstegRecnika" name="Oznaka iz opsteg recnika" type="string" variable="oznakaIzOpstegRecnika" default="12a" required="true"></activiti:formProperty>
         <activiti:formProperty id="vrstaPostupka" name="Vrsta postupka" type="enum" variable="vrstaPostupka" required="true">
           <activiti:value id="restriktivniPostupak" name="Restriktivni postupak"></activiti:value>
           <activiti:value id="nabavkaMaleVrednosti" name="Nabavka male vrednosti"></activiti:value>
           <activiti:value id="otvoreniPostupak" name="Otvoreni postupak"></activiti:value>
         </activiti:formProperty>
-        <activiti:formProperty id="procenjenaVrednost" name="Procenjena vrednost" type="double" variable="procenjenaVrednost" required="true"></activiti:formProperty>
+        <activiti:formProperty id="procenjenaVrednost" name="Procenjena vrednost" type="double" variable="procenjenaVrednost" default="500000" required="true"></activiti:formProperty>
         <activiti:taskListener event="complete" expression="#{JavnaNabavkaService.sacuvaj(nazivNarucioca,adresaNarucioca,rbrNabavke,predmetNabavke,nazivIzOpstegRecnika,oznakaIzOpstegRecnika,vrstaPostupka,procenjenaVrednost)}"></activiti:taskListener>
       </extensionElements>
     </userTask>
@@ -38,9 +38,9 @@
         <extensionElements>
           <activiti:formProperty id="adresaNarucioca" name="adresaNarucioca" type="string" variable="adresaNarucioca" default="${adresaNarucioca}" writable="false" required="true"></activiti:formProperty>
           <activiti:formProperty id="nazivNarucioca" name="Naziv narucioca" type="string" variable="nazivNarucioca" default="${nazivNarucioca}" writable="false" required="true"></activiti:formProperty>
-          <activiti:formProperty id="pravniOsnov" name="Pravni osnov" type="string" variable="pravniOsnov" required="true"></activiti:formProperty>
-          <activiti:formProperty id="nazivResenja" name="Naziv resenja" type="string" variable="nazivResenja" required="true"></activiti:formProperty>
-          <activiti:formProperty id="nazivOrganaDonosiocaResenja" name="Naziv organa donosioca resenja" type="string" variable="nazivOrganaDonosiocaResenja" required="true"></activiti:formProperty>
+          <activiti:formProperty id="pravniOsnov" name="Pravni osnov" type="string" variable="pravniOsnov" default="postoji pravni osnov" required="true"></activiti:formProperty>
+          <activiti:formProperty id="nazivResenja" name="Naziv resenja" type="string" variable="nazivResenja" default="odobreno resenje" required="true"></activiti:formProperty>
+          <activiti:formProperty id="nazivOrganaDonosiocaResenja" name="Naziv organa donosioca resenja" type="string" variable="nazivOrganaDonosiocaResenja" default="D.O.O Kanc" required="true"></activiti:formProperty>
         </extensionElements>
       </userTask>
       <sequenceFlow id="flow8" name="&gt;400 000" sourceRef="exclusivegateway2" targetRef="resenjeOFormiranjuKomisije">
@@ -68,26 +68,22 @@
         </sequenceFlow>
         <userTask id="usertask9" name="Otvaranje prijava i vodjenje zapisnika" activiti:candidateGroups="komisija" activiti:formKey="executeTask">
           <extensionElements>
-            <activiti:formProperty id="vremeOtvaranjaPonuda" name="Vreme otvaranja ponuda" type="date" variable="vremeOtvaranjaPonuda" required="true"></activiti:formProperty>
-            <activiti:formProperty id="predmetNabavke" name="Predmet nabavke" type="string" variable="predmetNabavke" required="true"></activiti:formProperty>
+            <activiti:formProperty id="vremeOtvaranjaPonuda" name="Vreme otvaranja ponuda" type="date" variable="vremeOtvaranjaPonuda" default="${vremeOtvaranjaPonuda}" required="true"></activiti:formProperty>
+            <activiti:formProperty id="predmetNabavke" name="Predmet nabavke" type="string" variable="predmetNabavke" default="${predmetNabavke}" writable="false" required="true"></activiti:formProperty>
             <activiti:formProperty id="imeClanaKomisije1" name="Clan komisije 1" type="string" variable="clan1" default="${clan1}" writable="false" required="true"></activiti:formProperty>
             <activiti:formProperty id="imeClanaKomisije2" name="Clan komisije 2" type="string" variable="clan2" default="${clan2}" writable="false" required="true"></activiti:formProperty>
             <activiti:formProperty id="imeClanaKomisije3" name="Clan komisije 3" type="string" variable="clan3" default="${clan3}" writable="false" required="true"></activiti:formProperty>
-            <activiti:formProperty id="imePredstavnikaPonudjaca" name="Ime predstavnika ponudjaca" type="string" variable="imePredstavnikaPonudjaca" required="true"></activiti:formProperty>
-            <activiti:formProperty id="brojPonude" name="Broj ponude" type="long" variable="brojPonude" required="true"></activiti:formProperty>
-            <activiti:formProperty id="nazivPonudjaca" name="Naziv ponudjaca" type="string" variable="nazivPonudjaca" required="true"></activiti:formProperty>
-            <activiti:formProperty id="sifraPonudjaca" name="Sifra ponudjaca" type="string" variable="sifraPonudjaca" required="true"></activiti:formProperty>
-            <activiti:formProperty id="ponudjenaCena" name="ponudjenaCena" type="double" variable="ponudjenaCena" required="true"></activiti:formProperty>
-            <activiti:formProperty id="popust" name="popust" type="double" variable="popust"></activiti:formProperty>
-            <activiti:formProperty id="uoceniNedostaci" name="Uoceni nedostaci" type="string" variable="uoceniNedostaci"></activiti:formProperty>
-            <activiti:formProperty id="primedbeNaOtvaranje" name="primedbeNaOtvaranje" type="string" variable="primedbeNaOtvaranje"></activiti:formProperty>
+            <activiti:formProperty id="nazivPodnosiocaPrijave" name="Naziv Podnosioca Prijave" type="string" variable="${prijava.nazivPodnosiocaPrijave}" default="${prijava.nazivPodnosiocaPrijave}" writable="false" required="true"></activiti:formProperty>
+            <activiti:formProperty id="adresaPodnosiocaPrijave" name="Adresa podnosioca prijave" type="string" variable="${prijava.adresaPodnosiocaPrijave}" default="${prijava.adresaPodnosiocaPrijave}" writable="false" required="true"></activiti:formProperty>
+            <activiti:formProperty id="emailPodnosiocaPrijave" name="Email Podnosioca Prijave" type="string" variable="${prijava.emailPodnosiocaPrijave}" default="${prijava.emailPodnosiocaPrijave}" writable="false" required="true"></activiti:formProperty>
+            <activiti:formProperty id="priznanjeKvalifikacije" name="Priznati kvalifikaciju" type="button" variable="priznanjeKvalifikacije"></activiti:formProperty>
+            <activiti:formProperty id="odbijanjeKvalifikacije" name="Odbiti kvalifikaciju" type="button" variable="odbijanjeKvalifikacije"></activiti:formProperty>
+            <activiti:taskListener event="complete" class="activiti.spring.javnaNabavka.springweb.services.BrojKvalifikovanihService"></activiti:taskListener>
           </extensionElements>
+          <multiInstanceLoopCharacteristics isSequential="false" activiti:collection="prijavljeniPonudjaci" activiti:elementVariable="prijava"></multiInstanceLoopCharacteristics>
         </userTask>
-        <userTask id="usertask11" name="Priznavanje kvalifikacije" activiti:candidateGroups="komisija" activiti:formKey="executeTask"></userTask>
-        <sequenceFlow id="flow39" sourceRef="usertask11" targetRef="mailtask3"></sequenceFlow>
-        <endEvent id="endevent6" name="End"></endEvent>
         <sequenceFlow id="flow40" sourceRef="mailtask3" targetRef="endevent6"></sequenceFlow>
-        <serviceTask id="servicetask2" name="Prijem prijava" activiti:expression="#{CommonService.posaljiPrijavu()}"></serviceTask>
+        <serviceTask id="servicetask2" name="Prijem prijava" activiti:expression="#{CommonsService.posaljiPrijavu()}"></serviceTask>
         <serviceTask id="mailtask1" name="Slanje potvrde prijema prijave" activiti:type="mail">
           <extensionElements>
             <activiti:field name="to">
@@ -105,15 +101,18 @@ Vasa prijava je uspesno primljena.]]></activiti:string>
         <serviceTask id="mailtask3" name="Obavjestavanje o priznavanju kvalifikacije" activiti:type="mail">
           <extensionElements>
             <activiti:field name="to">
-              <activiti:string><![CDATA[username1@localhost]]></activiti:string>
+              <activiti:expression><![CDATA[${prijavaZaMejl.emailPodnosiocaPrijave}]]></activiti:expression>
             </activiti:field>
             <activiti:field name="from">
               <activiti:string><![CDATA[username@localhost]]></activiti:string>
             </activiti:field>
             <activiti:field name="text">
-              <activiti:string><![CDATA[sdfdf]]></activiti:string>
+              <activiti:expression><![CDATA[Dragi ${prijavaZaMejl.nazivPodnosiocaPrijave},
+
+Sa adresom ${prijavaZaMejl.adresaPodnosiocaPrijave}, obavestavamo Vas da ste uspesno prosli kvalifikaciju za prijavu za javnu nabavku!]]></activiti:expression>
             </activiti:field>
           </extensionElements>
+          <multiInstanceLoopCharacteristics isSequential="false" activiti:collection="kvalifikovanePrijave" activiti:elementVariable="prijavaZaMejl"></multiInstanceLoopCharacteristics>
         </serviceTask>
         <intermediateThrowEvent id="pozivZaSlanjePrijavaSignal" name="Objavljen poziv za prijave na kvalifikaciju">
           <extensionElements>
@@ -125,31 +124,31 @@ Vasa prijava je uspesno primljena.]]></activiti:string>
           <extensionElements>
             <activiti:formProperty id="nazivNarucioca" name="nazivNarucioca" type="string" variable="nazivNarucioca" default="${nazivNarucioca}" writable="false" required="true"></activiti:formProperty>
             <activiti:formProperty id="adresaNarucioca" name="adresaNarucioca" type="string" variable="adresaNarucioca" default="${adresaNarucioca}" writable="false" required="true"></activiti:formProperty>
-            <activiti:formProperty id="internetStranicaNarucioca" name="internetStranicaNarucioca" type="string" variable="internetStranicaNarucioca" required="true"></activiti:formProperty>
-            <activiti:formProperty id="vrstaNarucioca" name="Vrsta narucioca" type="string" variable="vrstaNarucioca" required="true"></activiti:formProperty>
+            <activiti:formProperty id="internetStranicaNarucioca" name="internetStranicaNarucioca" type="string" variable="internetStranicaNarucioca" default="www.mercator.com" required="true"></activiti:formProperty>
+            <activiti:formProperty id="vrstaNarucioca" name="Vrsta narucioca" type="string" variable="vrstaNarucioca" default="preduzece" required="true"></activiti:formProperty>
             <activiti:formProperty id="vrstaPostupka" name="vrstaPostupka" type="enum" variable="vrstaPostupka" default="restriktivniPostupak" writable="false" required="true">
               <activiti:value id="restriktivniPostupak" name="Restriktivni postupak"></activiti:value>
               <activiti:value id="nabavkaMaleVrednosti" name="Nabavka male vrednosti"></activiti:value>
               <activiti:value id="otvoreniPostupak" name="Otvoreni postupak"></activiti:value>
             </activiti:formProperty>
-            <activiti:formProperty id="opisPredmetaNabavke" name="Opis predmeta nabavke" type="string" variable="opisPredmetaNabavke" required="true"></activiti:formProperty>
+            <activiti:formProperty id="opisPredmetaNabavke" name="Opis predmeta nabavke" type="string" variable="opisPredmetaNabavke" default="kancelarijski namestaj" required="true"></activiti:formProperty>
             <activiti:formProperty id="nazivIzOpstegRecnika" name="Naziv iz opsteg recnika" type="string" variable="nazivIzOpstegRecnika" default="${nazivIzOpstegRecnika}" writable="false" required="true"></activiti:formProperty>
             <activiti:formProperty id="oznakaIzOpstegRecnika" name="Oznaka iz opsteg recnika" type="string" variable="oznakaIzOpstegRecnika" default="${oznakaIzOpstegRecnika}" writable="false" required="true"></activiti:formProperty>
-            <activiti:formProperty id="obimRadova" name="Obim radova i osnovna obiljezja" type="string" variable="obimRadova"></activiti:formProperty>
-            <activiti:formProperty id="mestoIzvrsenjaRadova" name="Mesto izvrsenja radova" type="string" variable="mestoIzvrsenjaRadova"></activiti:formProperty>
-            <activiti:formProperty id="brojPartija" name="Broj partija" type="long" variable="brojPartija"></activiti:formProperty>
-            <activiti:formProperty id="posebnaNapomena" name="Posebna napomena" type="string" variable="posebnaNapomena"></activiti:formProperty>
-            <activiti:formProperty id="kriterijumZaDodeluUgovora" name="Kriterijum za dodelu ugovora" type="string" variable="kriterijumZaDodeluUgovora" required="true"></activiti:formProperty>
-            <activiti:formProperty id="internetAdresaKonkursneDokumentacije" name="Internet adresa konkursne dokumentacije" type="string" variable="internetAdresaKonkursneDokumentacije" required="true"></activiti:formProperty>
-            <activiti:formProperty id="internetAdresaNadleznogOrgana" name="Internet adresa nadleznog organa" type="string" variable="internetAdresaNadleznogOrgana"></activiti:formProperty>
-            <activiti:formProperty id="rokZaPodnosenjePonuda" name="Rok  za podnosenje ponuda" type="date" variable="rokZaPodnosenjePonuda" required="true"></activiti:formProperty>
-            <activiti:formProperty id="nacinPodnosenjaPonuda" name="Nacin podnosenja ponuda" type="string" variable="nacinPodnosenjaPonuda" required="true"></activiti:formProperty>
-            <activiti:formProperty id="mestoOtvaranjaPonuda" name="Mesto otvaranja ponuda" type="string" variable="mestoOtvaranjaPonuda" required="true"></activiti:formProperty>
-            <activiti:formProperty id="vremeOtvaranjaPonuda" name="Vreme otvaranja ponuda" type="date" variable="vremeOtvaranjaPonuda" required="true"></activiti:formProperty>
-            <activiti:formProperty id="nacinOtvaranjaPonuda" name="Nacin otvaranja ponuda" type="string" variable="nacinOtvaranjaPonuda" required="true"></activiti:formProperty>
-            <activiti:formProperty id="dodatniUslovi" name="Dodatni uslovi" type="string" variable="dodatniUslovi"></activiti:formProperty>
-            <activiti:formProperty id="rokZaDonosenjeOdluke" name="Rok za donosenje odluke" type="date" variable="rokZaDonosenjeOdluke" required="true"></activiti:formProperty>
-            <activiti:formProperty id="liceZaKontakt" name="Lice za kontakt" type="string" variable="liceZaKontakt"></activiti:formProperty>
+            <activiti:formProperty id="obimRadova" name="Obim radova i osnovna obiljezja" type="string" variable="obimRadova" default="srednji"></activiti:formProperty>
+            <activiti:formProperty id="mestoIzvrsenjaRadova" name="Mesto izvrsenja radova" type="string" variable="mestoIzvrsenjaRadova" default="Novi Sad"></activiti:formProperty>
+            <activiti:formProperty id="brojPartija" name="Broj partija" type="long" variable="brojPartija" default="2"></activiti:formProperty>
+            <activiti:formProperty id="posebnaNapomena" name="Posebna napomena" type="string" variable="posebnaNapomena" default="nema"></activiti:formProperty>
+            <activiti:formProperty id="kriterijumZaDodeluUgovora" name="Kriterijum za dodelu ugovora" type="string" variable="kriterijumZaDodeluUgovora" default="najmanja cena" required="true"></activiti:formProperty>
+            <activiti:formProperty id="internetAdresaKonkursneDokumentacije" name="Internet adresa konkursne dokumentacije" type="string" variable="internetAdresaKonkursneDokumentacije" default="www.konkursi.com" required="true"></activiti:formProperty>
+            <activiti:formProperty id="internetAdresaNadleznogOrgana" name="Internet adresa nadleznog organa" type="string" variable="internetAdresaNadleznogOrgana" default="www.nadlezniOrgan.com"></activiti:formProperty>
+            <activiti:formProperty id="rokZaPodnosenjePonuda" name="Rok  za podnosenje ponuda" type="date" variable="rokZaPodnosenjePonuda" default="05/05/2015" required="true"></activiti:formProperty>
+            <activiti:formProperty id="nacinPodnosenjaPonuda" name="Nacin podnosenja ponuda" type="string" variable="nacinPodnosenjaPonuda" default="usmeno" required="true"></activiti:formProperty>
+            <activiti:formProperty id="mestoOtvaranjaPonuda" name="Mesto otvaranja ponuda" type="string" variable="mestoOtvaranjaPonuda" default="Novi Sad" required="true"></activiti:formProperty>
+            <activiti:formProperty id="vremeOtvaranjaPonuda" name="Vreme otvaranja ponuda" type="date" variable="vremeOtvaranjaPonuda" default="05/05/2015" required="true"></activiti:formProperty>
+            <activiti:formProperty id="nacinOtvaranjaPonuda" name="Nacin otvaranja ponuda" type="string" variable="nacinOtvaranjaPonuda" default="javno" required="true"></activiti:formProperty>
+            <activiti:formProperty id="dodatniUslovi" name="Dodatni uslovi" type="string" variable="dodatniUslovi" default="nema"></activiti:formProperty>
+            <activiti:formProperty id="rokZaDonosenjeOdluke" name="Rok za donosenje odluke" type="date" variable="rokZaDonosenjeOdluke" default="05/05/2015" required="true"></activiti:formProperty>
+            <activiti:formProperty id="liceZaKontakt" name="Lice za kontakt" type="string" variable="liceZaKontakt" default="Marko Jankovic"></activiti:formProperty>
             <activiti:taskListener event="complete" expression="#{PozivZaKvalifikacijuService.sacuvaj(nazivNarucioca,adresaNarucioca,internetStranicaNarucioca,  vrstaNarucioca,vrstaPostupka, opisPredmetaNabavke,nazivIzOpstegRecnika, oznakaIzOpstegRecnika,obimRadova,mestoIzvrsenjaRadova,brojPartija,posebnaNapomena,kriterijumZaDodeluUgovora,internetAdresaKonkursneDokumentacije,internetAdresaNadleznogOrgana, rokZaPodnosenjePonuda,mestoOtvaranjaPonuda, vremeOtvaranjaPonuda,nacinOtvaranjaPonuda,  dodatniUslovi,rokZaDonosenjeOdluke, liceZaKontakt)}"></activiti:taskListener>
           </extensionElements>
         </userTask>
@@ -171,13 +170,16 @@ Vasa prijava je uspesno primljena.]]></activiti:string>
         <scriptTask id="scripttask1" name="Postavljanje tajmera" scriptFormat="javascript" activiti:autoStoreVariables="false">
           <script>execution.setVariable("istekaoTajmer","false");</script>
         </scriptTask>
-        <sequenceFlow id="flow83" sourceRef="usertask9" targetRef="usertask11"></sequenceFlow>
         <intermediateThrowEvent id="signalintermediatethrowevent1" name="SignalThrowEvent">
           <signalEventDefinition signalRef="signalObjavaPozivaZaPrijave"></signalEventDefinition>
         </intermediateThrowEvent>
-        <sequenceFlow id="flow125" sourceRef="exclusivegateway7" targetRef="usertask9">
+        <sequenceFlow id="flow125" sourceRef="exclusivegateway7" targetRef="servicetask6">
           <conditionExpression xsi:type="tFormalExpression"><![CDATA[${istekaoTajmer == 'true'}]]></conditionExpression>
         </sequenceFlow>
+        <sequenceFlow id="flow126" sourceRef="servicetask6" targetRef="usertask9"></sequenceFlow>
+        <serviceTask id="servicetask6" name="Pregled prijava" activiti:expression="#{RadSaPrijavamaService.listaPrijavljenih()}" activiti:resultVariableName="prijavljeniPonudjaci"></serviceTask>
+        <sequenceFlow id="flow127" sourceRef="usertask9" targetRef="mailtask3"></sequenceFlow>
+        <endEvent id="endevent6" name="End"></endEvent>
       </subProcess>
       <endEvent id="endevent8" name="End"></endEvent>
       <sequenceFlow id="flow65" sourceRef="servicetask3" targetRef="usertask14"></sequenceFlow>
@@ -205,19 +207,14 @@ Vasa prijava je uspesno primljena.]]></activiti:string>
       <sequenceFlow id="flow73" sourceRef="exclusivegateway2" targetRef="endevent8">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${procenjenaVrednost<400000}]]></conditionExpression>
       </sequenceFlow>
-      <sequenceFlow id="flow75" sourceRef="subprocess2" targetRef="scripttask2"></sequenceFlow>
-      <scriptTask id="scripttask2" name="Provera broja kvalifikovanih prijava" scriptFormat="javascript" activiti:autoStoreVariables="false">
-        <script>console.log("ok");</script>
-      </scriptTask>
       <exclusiveGateway id="exclusivegateway12" name="Exclusive Gateway"></exclusiveGateway>
-      <sequenceFlow id="flow76" sourceRef="scripttask2" targetRef="exclusivegateway12"></sequenceFlow>
       <endEvent id="endevent10" name="End"></endEvent>
       <sequenceFlow id="flow77" name="manje od 3" sourceRef="exclusivegateway12" targetRef="endevent10">
-        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${istekaoTajmer=='false'}]]></conditionExpression>
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${brojPotvrdjenihKvalifikacija < 3}]]></conditionExpression>
       </sequenceFlow>
       <userTask id="usertask15" name="Odredjivanje kriterijuma ocenjivanja u restriktivnom postupku" activiti:candidateGroups="komisija"></userTask>
       <sequenceFlow id="flow78" name="vise od 3" sourceRef="exclusivegateway12" targetRef="usertask15">
-        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${istekaoTajmer=='true'}]]></conditionExpression>
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${brojPotvrdjenihKvalifikacija > 3}]]></conditionExpression>
       </sequenceFlow>
       <sequenceFlow id="flow79" name="restriktivni" sourceRef="exclusivegateway11" targetRef="subprocess2">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${vrstaPostupka =='restriktivniPostupak'}]]></conditionExpression>
@@ -347,6 +344,7 @@ Vasa prijava je uspesno primljena.]]></activiti:string>
       <parallelGateway id="parallelgateway4" name="Exclusive Gateway"></parallelGateway>
       <endEvent id="endevent13" name="End"></endEvent>
       <sequenceFlow id="flow124" sourceRef="usertask26" targetRef="endevent13"></sequenceFlow>
+      <sequenceFlow id="flow128" sourceRef="subprocess2" targetRef="exclusivegateway12"></sequenceFlow>
     </subProcess>
     <sequenceFlow id="flow2" sourceRef="formiranjeOdlukeOPokretanju" targetRef="subprocess1"></sequenceFlow>
   </process>
@@ -398,13 +396,7 @@ Vasa prijava je uspesno primljena.]]></activiti:string>
         <omgdc:Bounds height="40.0" width="40.0" x="1134.0" y="377.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="usertask9" id="BPMNShape_usertask9">
-        <omgdc:Bounds height="81.0" width="125.0" x="680.0" y="350.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="usertask11" id="BPMNShape_usertask11">
-        <omgdc:Bounds height="63.0" width="105.0" x="823.0" y="494.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="endevent6" id="BPMNShape_endevent6">
-        <omgdc:Bounds height="35.0" width="35.0" x="1230.0" y="508.0"></omgdc:Bounds>
+        <omgdc:Bounds height="81.0" width="125.0" x="620.0" y="357.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="servicetask2" id="BPMNShape_servicetask2">
         <omgdc:Bounds height="55.0" width="105.0" x="1094.0" y="125.0"></omgdc:Bounds>
@@ -413,7 +405,7 @@ Vasa prijava je uspesno primljena.]]></activiti:string>
         <omgdc:Bounds height="65.0" width="113.0" x="1263.0" y="120.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="mailtask3" id="BPMNShape_mailtask3">
-        <omgdc:Bounds height="82.0" width="127.0" x="1020.0" y="485.0"></omgdc:Bounds>
+        <omgdc:Bounds height="82.0" width="127.0" x="730.0" y="485.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="pozivZaSlanjePrijavaSignal" id="BPMNShape_pozivZaSlanjePrijavaSignal">
         <omgdc:Bounds height="35.0" width="35.0" x="834.0" y="270.0"></omgdc:Bounds>
@@ -433,6 +425,12 @@ Vasa prijava je uspesno primljena.]]></activiti:string>
       <bpmndi:BPMNShape bpmnElement="signalintermediatethrowevent1" id="BPMNShape_signalintermediatethrowevent1">
         <omgdc:Bounds height="35.0" width="35.0" x="3802.0" y="645.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask6" id="BPMNShape_servicetask6">
+        <omgdc:Bounds height="55.0" width="105.0" x="840.0" y="370.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent6" id="BPMNShape_endevent6">
+        <omgdc:Bounds height="35.0" width="35.0" x="970.0" y="508.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="endevent8" id="BPMNShape_endevent8">
         <omgdc:Bounds height="35.0" width="35.0" x="955.0" y="746.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
@@ -447,9 +445,6 @@ Vasa prijava je uspesno primljena.]]></activiti:string>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="exclusivegateway11" id="BPMNShape_exclusivegateway11">
         <omgdc:Bounds height="40.0" width="40.0" x="1773.0" y="633.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="scripttask2" id="BPMNShape_scripttask2">
-        <omgdc:Bounds height="63.0" width="105.0" x="1734.0" y="308.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="exclusivegateway12" id="BPMNShape_exclusivegateway12">
         <omgdc:Bounds height="40.0" width="40.0" x="1884.0" y="320.0"></omgdc:Bounds>
@@ -622,13 +617,9 @@ Vasa prijava je uspesno primljena.]]></activiti:string>
           <omgdc:Bounds height="39.0" width="100.0" x="960.0" y="301.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow39" id="BPMNEdge_flow39">
-        <omgdi:waypoint x="928.0" y="525.0"></omgdi:waypoint>
-        <omgdi:waypoint x="1020.0" y="526.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow40" id="BPMNEdge_flow40">
-        <omgdi:waypoint x="1147.0" y="526.0"></omgdi:waypoint>
-        <omgdi:waypoint x="1230.0" y="525.0"></omgdi:waypoint>
+        <omgdi:waypoint x="857.0" y="526.0"></omgdi:waypoint>
+        <omgdi:waypoint x="970.0" y="525.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow48" id="BPMNEdge_flow48">
         <omgdi:waypoint x="579.0" y="142.0"></omgdi:waypoint>
@@ -667,14 +658,18 @@ Vasa prijava je uspesno primljena.]]></activiti:string>
         <omgdi:waypoint x="765.0" y="287.0"></omgdi:waypoint>
         <omgdi:waypoint x="834.0" y="287.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow83" id="BPMNEdge_flow83">
-        <omgdi:waypoint x="742.0" y="431.0"></omgdi:waypoint>
-        <omgdi:waypoint x="741.0" y="525.0"></omgdi:waypoint>
-        <omgdi:waypoint x="823.0" y="525.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow125" id="BPMNEdge_flow125">
         <omgdi:waypoint x="1134.0" y="397.0"></omgdi:waypoint>
-        <omgdi:waypoint x="805.0" y="390.0"></omgdi:waypoint>
+        <omgdi:waypoint x="945.0" y="397.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow126" id="BPMNEdge_flow126">
+        <omgdi:waypoint x="840.0" y="397.0"></omgdi:waypoint>
+        <omgdi:waypoint x="745.0" y="397.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow127" id="BPMNEdge_flow127">
+        <omgdi:waypoint x="682.0" y="438.0"></omgdi:waypoint>
+        <omgdi:waypoint x="680.0" y="526.0"></omgdi:waypoint>
+        <omgdi:waypoint x="730.0" y="526.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow65" id="BPMNEdge_flow65">
         <omgdi:waypoint x="1393.0" y="696.0"></omgdi:waypoint>
@@ -702,26 +697,18 @@ Vasa prijava je uspesno primljena.]]></activiti:string>
         <omgdi:waypoint x="972.0" y="673.0"></omgdi:waypoint>
         <omgdi:waypoint x="972.0" y="746.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow75" id="BPMNEdge_flow75">
-        <omgdi:waypoint x="1705.0" y="335.0"></omgdi:waypoint>
-        <omgdi:waypoint x="1734.0" y="339.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow76" id="BPMNEdge_flow76">
-        <omgdi:waypoint x="1839.0" y="339.0"></omgdi:waypoint>
-        <omgdi:waypoint x="1884.0" y="340.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow77" id="BPMNEdge_flow77">
         <omgdi:waypoint x="1904.0" y="320.0"></omgdi:waypoint>
         <omgdi:waypoint x="1904.0" y="215.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="13.0" width="53.0" x="1818.0" y="244.0"></omgdc:Bounds>
+          <omgdc:Bounds height="13.0" width="100.0" x="1818.0" y="244.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow78" id="BPMNEdge_flow78">
         <omgdi:waypoint x="1924.0" y="340.0"></omgdi:waypoint>
         <omgdi:waypoint x="2004.0" y="341.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="13.0" width="42.0" x="1939.0" y="347.0"></omgdc:Bounds>
+          <omgdc:Bounds height="13.0" width="100.0" x="1939.0" y="347.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow79" id="BPMNEdge_flow79">
@@ -912,6 +899,10 @@ Vasa prijava je uspesno primljena.]]></activiti:string>
       <bpmndi:BPMNEdge bpmnElement="flow124" id="BPMNEdge_flow124">
         <omgdi:waypoint x="4004.0" y="1217.0"></omgdi:waypoint>
         <omgdi:waypoint x="4049.0" y="1217.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow128" id="BPMNEdge_flow128">
+        <omgdi:waypoint x="1705.0" y="335.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1884.0" y="340.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
         <omgdi:waypoint x="222.0" y="253.0"></omgdi:waypoint>

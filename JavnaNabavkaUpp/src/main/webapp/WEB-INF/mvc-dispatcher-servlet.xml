@@ -95,6 +95,8 @@
 		class="activiti.spring.javnaNabavka.springweb.persistence.services.JavnaNabavkaService" />
 	<bean id="PozivZaKvalifikacijuService"
 		class="activiti.spring.javnaNabavka.springweb.persistence.services.PozivZaKvalifikacijuService" />
+	<bean id="BrojKvalifikovanihService"
+		class="activiti.spring.javnaNabavka.springweb.services.BrojKvalifikovanihService" />
 
 
 

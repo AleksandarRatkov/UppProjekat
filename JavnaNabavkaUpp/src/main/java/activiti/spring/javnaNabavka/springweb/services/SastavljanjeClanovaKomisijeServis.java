@@ -5,7 +5,7 @@ import org.activiti.engine.delegate.DelegateTask;
 import org.activiti.engine.delegate.TaskListener;
 import org.springframework.stereotype.Service;
 
-@Service("EvidencijaClanovaKomisijeServis")
+@Service("SastavljanjeClanovaKomisijeServis")
 public class SastavljanjeClanovaKomisijeServis implements TaskListener{
 
 	/**
