@@ -14,8 +14,9 @@ import org.activiti.engine.repository.Deployment;
  */
 public class ProcessDeployer {
 
-	private static final String filename = "diagrams/Test.bpmn";
-	private static final String tenderPrijavljivanje = "diagrams/PrijavljivanjeNaTender.bpmn";
+	private static final String procesJavneNabavke = "diagrams/Test.bpmn";
+	private static final String slanjePrijave = "diagrams/SlanjePrijave.bpmn";
+	private static final String slanjePonude = "diagrams/SlanjePonuda.bpmn";
 	private static Scanner scanner;
 
 	public static void main (String[] args){
@@ -34,9 +35,12 @@ public class ProcessDeployer {
 					repositoryService.deleteDeployment(d.getId(),true);
 				}
 		
-		repositoryService.createDeployment().addClasspathResource(filename).deploy();
+		repositoryService.createDeployment().addClasspathResource(procesJavneNabavke).deploy();
 
-		repositoryService.createDeployment().addClasspathResource(tenderPrijavljivanje).deploy();
+		repositoryService.createDeployment().addClasspathResource(slanjePrijave).deploy();
+		
+		repositoryService.createDeployment().addClasspathResource(slanjePonude).deploy();
+		
 			System.out.println("Ukupan broj deployment-a: " + repositoryService.createDeploymentQuery().count());
 		}
 	}

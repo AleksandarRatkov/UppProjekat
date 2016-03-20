@@ -12,14 +12,16 @@ public class Ponudjac{
 	private String prezime;
 	private String email;
 	private String lozinka;
-	private boolean poslataPrijava;
+	private Boolean poslataPrijava;
+	private Boolean mozePoslatiPonudu;
+	private Boolean poslataPonuda;
 	
 	public Ponudjac() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public Ponudjac(String id, String ime, String prezime, String email, String lozinka, boolean poslataPrijava) {
+	public Ponudjac(String id, String ime, String prezime, String email, String lozinka, boolean poslataPrijava,boolean mozePoslatiPonudu, Boolean poslataPonuda) {
 		super();
 		this.id = id;
 		this.ime = ime;
@@ -27,6 +29,8 @@ public class Ponudjac{
 		this.email = email;
 		this.lozinka = lozinka;
 		this.poslataPrijava = poslataPrijava;
+		this.mozePoslatiPonudu = mozePoslatiPonudu;
+		this.poslataPonuda = poslataPonuda;
 	}
 
 	public String getId() {
@@ -69,13 +73,31 @@ public class Ponudjac{
 		this.lozinka = lozinka;
 	}
 
-	public boolean isPoslataPrijava() {
+	public Boolean getPoslataPrijava() {
 		return poslataPrijava;
 	}
 
-	public void setPoslataPrijava(boolean poslataPrijava) {
+	public void setPoslataPrijava(Boolean poslataPrijava) {
 		this.poslataPrijava = poslataPrijava;
 	}
+
+	public Boolean getMozePoslatiPonudu() {
+		return mozePoslatiPonudu;
+	}
+
+	public void setMozePoslatiPonudu(Boolean mozePoslatiPonudu) {
+		this.mozePoslatiPonudu = mozePoslatiPonudu;
+	}
+
+	public Boolean getPoslataPonuda() {
+		return poslataPonuda;
+	}
+
+	public void setPoslataPonuda(Boolean poslataPonuda) {
+		this.poslataPonuda = poslataPonuda;
+	}
+
+	
 	
 	
 }

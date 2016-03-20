@@ -1,12 +1,14 @@
 package activiti.spring.javnaNabavka.enitity;
 
+import java.io.Serializable;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 
 @Entity
-public class Prijava {
+public class Prijava implements Serializable{
 
 	@Id
 	@GeneratedValue
@@ -28,13 +30,12 @@ public class Prijava {
 		this.emailPodnosiocaPrijave = emailPodnosiocaPrijave;
 	}
 	
-	
 
-	public String getString() {
+	public String getUser() {
 		return user;
 	}
 
-	public void setString(String user) {
+	public void setUser(String user) {
 		this.user = user;
 	}
 

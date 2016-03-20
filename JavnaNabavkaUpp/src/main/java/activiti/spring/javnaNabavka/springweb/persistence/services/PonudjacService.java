@@ -11,41 +11,84 @@ import org.springframework.stereotype.Service;
 
 import activiti.spring.javnaNabavka.enitity.Ponudjac;
 
-
 @Service("PonudjacService")
 public class PonudjacService {
 
 	@PersistenceContext
 	private EntityManager entityManager;
-	
-	public Ponudjac sacuvaj(String id,String ime,String prezime,String email,String lozinka,Boolean poslaoPrijavu){
-		
+
+	public Ponudjac sacuvaj(String id, String ime, String prezime, String email, String lozinka, Boolean poslaoPrijavu,
+			Boolean mozePoslatiPonudu, Boolean poslaoPonudu) {
+
 		System.out.println("Ponudjac sacuvaj");
-		Ponudjac ponudjac = new Ponudjac(id,ime,prezime,email,lozinka,poslaoPrijavu);
-		
+		Ponudjac ponudjac = new Ponudjac(id, ime, prezime, email, lozinka, poslaoPrijavu, mozePoslatiPonudu,
+				poslaoPonudu);
+
 		entityManager.persist(ponudjac);
 		return ponudjac;
 	}
-	
-	public ArrayList<String> vratiAktivnePonudjace(){
+
+	public ArrayList<String> vratiAktivnePonudjace() {
 		System.out.println("usao u vratiAktivPonudj");
 		@SuppressWarnings("unchecked")
-		ArrayList<String> adekvatniKorisnici = (ArrayList<String>) entityManager.createQuery("SELECT id FROM Ponudjac WHERE poslataPrijava = 0").getResultList();
+		ArrayList<String> adekvatniKorisnici = (ArrayList<String>) entityManager
+				.createQuery("SELECT id FROM Ponudjac WHERE poslataPrijava = 0").getResultList();
 		System.out.println("adekvatniKor su: " + adekvatniKorisnici);
 		return adekvatniKorisnici;
 	}
-	
-	public Ponudjac editujFleg(){
-		System.out.println("Usao u edit flega!");
+
+	public Ponudjac editujFlegPrijava() {
+		System.out.println("Usao u edit flega prijava!");
 		User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		System.out.println("User koji je ulogovan je : " + u);
-		
-		Ponudjac p = (Ponudjac)entityManager.createQuery("SELECT p FROM Ponudjac p WHERE id = '" + u.getUsername() + "'").getSingleResult();
+
+		Ponudjac p = (Ponudjac) entityManager
+				.createQuery("SELECT p FROM Ponudjac p WHERE id = '" + u.getUsername() + "'").getSingleResult();
 		System.out.println("Ponudjac je : " + p);
 		p.setPoslataPrijava(true);
 		entityManager.merge(p);
-		
+
 		return p;
-		
+
+	}
+
+	public Ponudjac editujFlegPonuda(String id) {
+		System.out.println("Usao u edit flega ponuda!");
+
+		Ponudjac p = (Ponudjac) entityManager.createQuery("SELECT p FROM Ponudjac p WHERE id = '" + id + "'")
+				.getSingleResult();
+		System.out.println("Ponudjac je : " + p);
+		p.setMozePoslatiPonudu(true);
+		entityManager.merge(p);
+
+		return p;
+
+	}
+
+	public ArrayList<String> vratiKvalifikovanePonudjace() {
+		System.out.println("usao u vratiKvalifikovanePonudjace");
+		@SuppressWarnings("unchecked")
+		ArrayList<String> adekvatniKorisnici = (ArrayList<String>) entityManager
+				.createQuery("SELECT id FROM Ponudjac WHERE mozesPoslatiPonudu = 1 AND poslataPonuda = 0")
+				.getResultList();
+		System.out.println("adekvatniKor su: " + adekvatniKorisnici);
+		return adekvatniKorisnici;
+	}
+
+	
+	public Ponudjac editujFlegPoslataPonuda(String id) {
+		System.out.println("Usao u edit editujFlegPoslataPonuda!");
+
+		User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		System.out.println("User koji je ulogovan je : " + u);
+
+		Ponudjac p = (Ponudjac) entityManager
+				.createQuery("SELECT p FROM Ponudjac p WHERE id = '" + u.getUsername() + "'").getSingleResult();
+		System.out.println("Ponudjac je : " + p);
+		p.setPoslataPonuda(true);
+		entityManager.merge(p);
+
+		return p;
+
 	}
 }
