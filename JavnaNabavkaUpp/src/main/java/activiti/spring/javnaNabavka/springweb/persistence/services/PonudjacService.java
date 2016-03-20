@@ -69,14 +69,14 @@ public class PonudjacService {
 		System.out.println("usao u vratiKvalifikovanePonudjace");
 		@SuppressWarnings("unchecked")
 		ArrayList<String> adekvatniKorisnici = (ArrayList<String>) entityManager
-				.createQuery("SELECT id FROM Ponudjac WHERE mozesPoslatiPonudu = 1 AND poslataPonuda = 0")
+				.createQuery("SELECT id FROM Ponudjac WHERE mozePoslatiPonudu = 1 AND poslataPonuda = 0")
 				.getResultList();
 		System.out.println("adekvatniKor su: " + adekvatniKorisnici);
 		return adekvatniKorisnici;
 	}
 
 	
-	public Ponudjac editujFlegPoslataPonuda(String id) {
+	public Ponudjac editujFlegPoslataPonuda() {
 		System.out.println("Usao u edit editujFlegPoslataPonuda!");
 
 		User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
