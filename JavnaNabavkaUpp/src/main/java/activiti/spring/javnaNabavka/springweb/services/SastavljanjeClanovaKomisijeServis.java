@@ -31,9 +31,6 @@ public class SastavljanjeClanovaKomisijeServis implements TaskListener{
 		}
 		
 		execution.setVariable("brojPotvrdjenihClanova", brojPotvrdjenihClanova);
-		System.out.println("zakacen broj "+brojPotvrdjenihClanova+" na proces "+execution.getProcessInstanceId());
-		System.out.println("broj Potvrdjenih "+brojPotvrdjenihClanova+" id procesa "+execution.getProcessInstanceId());
-		System.out.println("komisija je : " + execution.getVariable("komisija"));
 	}
 	
 }

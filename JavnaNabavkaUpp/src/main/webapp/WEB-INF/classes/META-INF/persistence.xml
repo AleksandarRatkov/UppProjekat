@@ -8,6 +8,7 @@ version="2.0">
 	<class>activiti.spring.javnaNabavka.enitity.JavnaNabavka</class>
 	<class>activiti.spring.javnaNabavka.enitity.PozivKvalifikacija</class>
 	<class>activiti.spring.javnaNabavka.enitity.Prijava</class>
+	<class>activiti.spring.javnaNabavka.enitity.Ponudjac</class>
 	<exclude-unlisted-classes>true</exclude-unlisted-classes>
 	<properties>
 		<property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5Dialect" />

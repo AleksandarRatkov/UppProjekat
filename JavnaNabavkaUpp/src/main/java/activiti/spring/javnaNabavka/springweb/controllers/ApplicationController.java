@@ -129,7 +129,6 @@ public class ApplicationController {
 					.getFormProperties();
 		
 			if (proveriFormiranjeKomsije(taskId)) {
-				System.out.println("usao u if");
 				List<org.activiti.engine.identity.User> listaPravnika = identityService.createUserQuery().memberOfGroup("liceSaDrugimStepenomObrazovanja").list();
 				List<org.activiti.engine.identity.User> listaStranihLica= identityService.createUserQuery().memberOfGroup("stranoLice").list();
 				List<org.activiti.engine.identity.User> listaNarucilaca= identityService.createUserQuery().memberOfGroup("narucilac").list();

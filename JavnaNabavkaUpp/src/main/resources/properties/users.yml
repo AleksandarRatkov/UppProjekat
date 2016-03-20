@@ -24,6 +24,51 @@ groups:
  - id: ponudjac
 ---
 
+id: kika
+firstName: Kika
+lastName: Kikic
+email: kika@localhost.com
+password: kika
+groups:
+ - id: ponudjac
+---
+
+id: klara
+firstName: Klara
+lastName: Klaric
+email: klara@localhost.com
+password: klara
+groups:
+ - id: ponudjac
+---
+
+id: tara
+firstName: Tara
+lastName: Taric
+email: tara@localhost.com
+password: tara
+groups:
+ - id: ponudjac
+---
+
+id: lara
+firstName: Lara
+lastName: Laric
+email: sara@localhost.com
+password: lara
+groups:
+ - id: ponudjac
+---
+
+id: sara
+firstName: Sara
+lastName: Saric
+email: sara@localhost.com
+password: sara
+groups:
+ - id: ponudjac
+---
+
 id: luka
 firstName: Luka
 lastName: Lukic
