@@ -9,6 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
+import activiti.spring.javnaNabavka.enitity.Ponuda;
 import activiti.spring.javnaNabavka.enitity.Ponudjac;
 
 @Service("PonudjacService")
@@ -26,6 +27,16 @@ public class PonudjacService {
 
 		entityManager.persist(ponudjac);
 		return ponudjac;
+	}
+	
+	public Ponuda sacuvajPonudu(String nazivNarucioca, String adresaNarucioca,Double procenjenaVrednost,Double ponudjenaCena) {
+
+		User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		System.out.println("Ponuda sacuvaj");
+		Ponuda ponuda = new Ponuda(u.getUsername(),nazivNarucioca,adresaNarucioca,procenjenaVrednost,ponudjenaCena);
+
+		entityManager.persist(ponuda);
+		return ponuda;
 	}
 
 	public ArrayList<String> vratiAktivnePonudjace() {

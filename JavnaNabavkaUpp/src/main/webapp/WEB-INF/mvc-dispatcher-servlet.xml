@@ -65,8 +65,7 @@
 	</bean>
 
 	<bean id="processEngine" class="org.activiti.spring.ProcessEngineFactoryBean">
-		<property name="processEngineConfiguration"
-			ref="processEngineConfiguration" />
+		<property name="processEngineConfiguration" ref="processEngineConfiguration" />
 	</bean>
 
 	<bean id="repositoryService" factory-bean="processEngine"
@@ -100,5 +99,6 @@
 		class="activiti.spring.javnaNabavka.springweb.services.BrojKvalifikovanihService" />
 	<bean id="PonudjacService"
 		class="activiti.spring.javnaNabavka.springweb.persistence.services.PonudjacService" />
-
+	<bean id="BaciPorukuService"
+		class="activiti.spring.javnaNabavka.springweb.services.BaciPorukuService" />
 </beans>
