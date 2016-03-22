@@ -21,6 +21,7 @@
         </activiti:formProperty>
         <activiti:formProperty id="procenjenaVrednost" name="Procenjena vrednost" type="double" variable="procenjenaVrednost" default="500000" required="true"></activiti:formProperty>
         <activiti:taskListener event="complete" expression="#{JavnaNabavkaService.sacuvaj(nazivNarucioca,adresaNarucioca,rbrNabavke,predmetNabavke,nazivIzOpstegRecnika,oznakaIzOpstegRecnika,vrstaPostupka,procenjenaVrednost)}"></activiti:taskListener>
+        <activiti:taskListener event="create" class="activiti.spring.javnaNabavka.springweb.services.PokupiPonudjace"></activiti:taskListener>
       </extensionElements>
     </userTask>
     <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="formiranjeOdlukeOPokretanju"></sequenceFlow>
@@ -34,7 +35,6 @@
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${uPlanu == 'false'}]]></conditionExpression>
       </sequenceFlow>
       <serviceTask id="servicetask1" name="Provera plana" activiti:expression="#{CommonsService.proveraPlana()}" activiti:resultVariableName="uPlanu"></serviceTask>
-      <exclusiveGateway id="exclusivegateway2" name="Exclusive Gateway"></exclusiveGateway>
       <userTask id="resenjeOFormiranjuKomisije" name="Resenje o formiranju komisije" activiti:candidateGroups="narucilac" activiti:formKey="executeTask">
         <extensionElements>
           <activiti:formProperty id="adresaNarucioca" name="adresaNarucioca" type="string" variable="adresaNarucioca" default="${adresaNarucioca}" writable="false" required="true"></activiti:formProperty>
@@ -44,22 +44,14 @@
           <activiti:formProperty id="nazivOrganaDonosiocaResenja" name="Naziv organa donosioca resenja" type="string" variable="nazivOrganaDonosiocaResenja" default="D.O.O Kanc" required="true"></activiti:formProperty>
         </extensionElements>
       </userTask>
-      <sequenceFlow id="flow8" name="&gt;400 000" sourceRef="exclusivegateway2" targetRef="resenjeOFormiranjuKomisije">
-        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${procenjenaVrednost>400000}]]></conditionExpression>
-      </sequenceFlow>
       <sequenceFlow id="flow18" sourceRef="resenjeOFormiranjuKomisije" targetRef="servicetask3"></sequenceFlow>
-      <sequenceFlow id="flow23" sourceRef="exclusivegateway1" targetRef="exclusivegateway2">
+      <sequenceFlow id="flow23" sourceRef="exclusivegateway1" targetRef="exclusivegateway21">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${uPlanu=='true'}]]></conditionExpression>
       </sequenceFlow>
       <subProcess id="subprocess2" name="restriktivni postupak - kvalifikacija">
         <startEvent id="startevent3" name="Start"></startEvent>
         <eventBasedGateway id="eventgateway1" name="Exclusive Gateway"></eventBasedGateway>
-        <intermediateCatchEvent id="timerintermediatecatchevent1" name="tajmerZaPrijave">
-          <timerEventDefinition>
-            <timeDuration>PT1M</timeDuration>
-          </timerEventDefinition>
-        </intermediateCatchEvent>
-        <sequenceFlow id="flow27" sourceRef="eventgateway1" targetRef="timerintermediatecatchevent1"></sequenceFlow>
+        <sequenceFlow id="flow27" sourceRef="eventgateway1" targetRef="timerintermediatecatchevent3"></sequenceFlow>
         <sequenceFlow id="flow30" sourceRef="servicetask2" targetRef="mailtask1"></sequenceFlow>
         <exclusiveGateway id="exclusivegateway6" name="Exclusive Gateway"></exclusiveGateway>
         <sequenceFlow id="flow32" sourceRef="mailtask1" targetRef="exclusivegateway6"></sequenceFlow>
@@ -149,7 +141,7 @@ Sa adresom ${prijavaZaMejl.adresaPodnosiocaPrijave}, obavestavamo Vas da ste usp
           <signalEventDefinition signalRef="signalSlanjePrijave"></signalEventDefinition>
         </intermediateCatchEvent>
         <sequenceFlow id="flow53" sourceRef="signalintermediatecatchevent1" targetRef="servicetask2"></sequenceFlow>
-        <sequenceFlow id="flow62" sourceRef="timerintermediatecatchevent1" targetRef="azuriranjeTajmera"></sequenceFlow>
+        <sequenceFlow id="flow62" sourceRef="timerintermediatecatchevent3" targetRef="azuriranjeTajmera"></sequenceFlow>
         <sequenceFlow id="flow63" sourceRef="azuriranjeTajmera" targetRef="exclusivegateway6"></sequenceFlow>
         <scriptTask id="azuriranjeTajmera" name="Azuriranje tajmera" scriptFormat="javascript" activiti:autoStoreVariables="false">
           <script>execution.setVariable("istekaoTajmer", "true");</script>
@@ -182,13 +174,13 @@ Sa adresom ${prijavaZaMejl.adresaPodnosiocaPrijave}, obavestavamo Vas da ste usp
         </sequenceFlow>
         <sequenceFlow id="flow145" sourceRef="scripttask1" targetRef="signalintermediatethrowevent3"></sequenceFlow>
         <sequenceFlow id="flow146" sourceRef="eventgateway1" targetRef="signalintermediatecatchevent1"></sequenceFlow>
+        <intermediateCatchEvent id="timerintermediatecatchevent3" name="tajmerZaPrijave">
+          <timerEventDefinition>
+            <timeDuration>PT1M</timeDuration>
+          </timerEventDefinition>
+        </intermediateCatchEvent>
       </subProcess>
       <endEvent id="endevent8" name="End"></endEvent>
-      <exclusiveGateway id="exclusivegateway10" name="Exclusive Gateway"></exclusiveGateway>
-      <sequenceFlow id="flow66" sourceRef="usertask14" targetRef="exclusivegateway10"></sequenceFlow>
-      <sequenceFlow id="flow68" sourceRef="exclusivegateway10" targetRef="resenjeOFormiranjuKomisije">
-        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${brojPotvrdjenihClanova!=3}]]></conditionExpression>
-      </sequenceFlow>
       <serviceTask id="servicetask3" name="Procesiranje resenja i slanje komisiji" activiti:class="activiti.spring.javnaNabavka.springweb.services.PripremaResenjaZaKomisiju"></serviceTask>
       <userTask id="usertask14" name="Potpisivanje resenja o nepostojanju sukoba interesa" activiti:assignee="${asignee}" activiti:formKey="executeTask">
         <extensionElements>
@@ -199,12 +191,6 @@ Sa adresom ${prijavaZaMejl.adresaPodnosiocaPrijave}, obavestavamo Vas da ste usp
         <multiInstanceLoopCharacteristics isSequential="false" activiti:collection="clanoviKomisije" activiti:elementVariable="asignee"></multiInstanceLoopCharacteristics>
       </userTask>
       <exclusiveGateway id="exclusivegateway11" name="Exclusive Gateway"></exclusiveGateway>
-      <sequenceFlow id="flow69" sourceRef="exclusivegateway10" targetRef="exclusivegateway11">
-        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${brojPotvrdjenihClanova==3}]]></conditionExpression>
-      </sequenceFlow>
-      <sequenceFlow id="flow73" sourceRef="exclusivegateway2" targetRef="endevent8">
-        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${procenjenaVrednost<400000}]]></conditionExpression>
-      </sequenceFlow>
       <exclusiveGateway id="exclusivegateway12" name="Exclusive Gateway"></exclusiveGateway>
       <endEvent id="endevent10" name="End"></endEvent>
       <sequenceFlow id="flow77" name="manje od 3" sourceRef="exclusivegateway12" targetRef="endevent10">
@@ -263,13 +249,8 @@ Sa adresom ${prijavaZaMejl.adresaPodnosiocaPrijave}, obavestavamo Vas da ste usp
         <signalEventDefinition signalRef="signalSlanjaPonude"></signalEventDefinition>
       </intermediateCatchEvent>
       <sequenceFlow id="flow100" sourceRef="eventgateway2" targetRef="signalintermediatecatchevent2"></sequenceFlow>
-      <intermediateCatchEvent id="timerintermediatecatchevent2" name="tajmerZaPonude">
-        <timerEventDefinition>
-          <timeDuration>PT1M</timeDuration>
-        </timerEventDefinition>
-      </intermediateCatchEvent>
-      <sequenceFlow id="flow101" sourceRef="eventgateway2" targetRef="timerintermediatecatchevent2"></sequenceFlow>
-      <sequenceFlow id="flow102" sourceRef="timerintermediatecatchevent2" targetRef="scripttask3"></sequenceFlow>
+      <sequenceFlow id="flow101" sourceRef="eventgateway2" targetRef="timerintermediatecatchevent4"></sequenceFlow>
+      <sequenceFlow id="flow102" sourceRef="timerintermediatecatchevent4" targetRef="scripttask3"></sequenceFlow>
       <scriptTask id="scripttask3" name="Azuriranje tajmera za podnosenja ponuda" scriptFormat="javascript" activiti:autoStoreVariables="false">
         <script>execution.setVariable("istekaoTajmer1","true");</script>
       </scriptTask>
@@ -344,8 +325,6 @@ Sa adresom ${prijavaZaMejl.adresaPodnosiocaPrijave}, obavestavamo Vas da ste usp
       <endEvent id="endevent13" name="End"></endEvent>
       <sequenceFlow id="flow124" sourceRef="usertask26" targetRef="endevent13"></sequenceFlow>
       <sequenceFlow id="flow128" sourceRef="subprocess2" targetRef="exclusivegateway12"></sequenceFlow>
-      <sequenceFlow id="flow129" sourceRef="servicetask3" targetRef="servicetask7"></sequenceFlow>
-      <sequenceFlow id="flow130" sourceRef="servicetask7" targetRef="usertask14"></sequenceFlow>
       <serviceTask id="servicetask7" name="Sacuvaj ponudjace" activiti:expression="#{PonudjacService.sacuvaj(adekvatniPonudjac.id,adekvatniPonudjac.firstName,adekvatniPonudjac.lastName,adekvatniPonudjac.email,adekvatniPonudjac.password,false,false,false)}">
         <multiInstanceLoopCharacteristics isSequential="false" activiti:collection="adekvatniPonudjaci" activiti:elementVariable="adekvatniPonudjac"></multiInstanceLoopCharacteristics>
       </serviceTask>
@@ -362,6 +341,28 @@ Sa adresom ${prijavaZaMejl.adresaPodnosiocaPrijave}, obavestavamo Vas da ste usp
       <sequenceFlow id="flow147" sourceRef="scripttask4" targetRef="servicetask10"></sequenceFlow>
       <serviceTask id="servicetask10" name="Bacanje poruke" activiti:class="activiti.spring.javnaNabavka.springweb.services.BaciPorukuService"></serviceTask>
       <sequenceFlow id="flow148" sourceRef="servicetask10" targetRef="eventgateway2"></sequenceFlow>
+      <sequenceFlow id="flow149" sourceRef="servicetask3" targetRef="usertask14"></sequenceFlow>
+      <sequenceFlow id="flow152" sourceRef="servicetask7" targetRef="resenjeOFormiranjuKomisije"></sequenceFlow>
+      <exclusiveGateway id="exclusivegateway20" name="Exclusive Gateway"></exclusiveGateway>
+      <sequenceFlow id="flow153" sourceRef="usertask14" targetRef="exclusivegateway20"></sequenceFlow>
+      <sequenceFlow id="flow154" sourceRef="exclusivegateway20" targetRef="resenjeOFormiranjuKomisije">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${brojPotvrdjenihClanova!=3}]]></conditionExpression>
+      </sequenceFlow>
+      <sequenceFlow id="flow155" sourceRef="exclusivegateway20" targetRef="exclusivegateway11">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${brojPotvrdjenihClanova==3}]]></conditionExpression>
+      </sequenceFlow>
+      <exclusiveGateway id="exclusivegateway21" name="Exclusive Gateway"></exclusiveGateway>
+      <sequenceFlow id="flow156" sourceRef="exclusivegateway21" targetRef="endevent8">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${procenjenaVrednost<400000}]]></conditionExpression>
+      </sequenceFlow>
+      <sequenceFlow id="flow157" sourceRef="exclusivegateway21" targetRef="servicetask7" skipExpression="&gt;400000">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${procenjenaVrednost>400000}]]></conditionExpression>
+      </sequenceFlow>
+      <intermediateCatchEvent id="timerintermediatecatchevent4" name="tajmerZaPonude">
+        <timerEventDefinition>
+          <timeDuration>PT1M</timeDuration>
+        </timerEventDefinition>
+      </intermediateCatchEvent>
     </subProcess>
     <sequenceFlow id="flow2" sourceRef="formiranjeOdlukeOPokretanju" targetRef="subprocess1"></sequenceFlow>
   </process>
@@ -388,11 +389,8 @@ Sa adresom ${prijavaZaMejl.adresaPodnosiocaPrijave}, obavestavamo Vas da ste usp
       <bpmndi:BPMNShape bpmnElement="servicetask1" id="BPMNShape_servicetask1">
         <omgdc:Bounds height="55.0" width="105.0" x="584.0" y="636.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="exclusivegateway2" id="BPMNShape_exclusivegateway2">
-        <omgdc:Bounds height="40.0" width="40.0" x="932.0" y="643.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="resenjeOFormiranjuKomisije" id="BPMNShape_resenjeOFormiranjuKomisije">
-        <omgdc:Bounds height="68.0" width="116.0" x="1104.0" y="630.0"></omgdc:Bounds>
+        <omgdc:Bounds height="68.0" width="116.0" x="1180.0" y="631.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="subprocess2" id="BPMNShape_subprocess2">
         <omgdc:Bounds height="491.0" width="1175.0" x="510.0" y="100.0"></omgdc:Bounds>
@@ -402,9 +400,6 @@ Sa adresom ${prijavaZaMejl.adresaPodnosiocaPrijave}, obavestavamo Vas da ste usp
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="eventgateway1" id="BPMNShape_eventgateway1">
         <omgdc:Bounds height="40.0" width="40.0" x="963.0" y="277.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="timerintermediatecatchevent1" id="BPMNShape_timerintermediatecatchevent1">
-        <omgdc:Bounds height="35.0" width="35.0" x="1080.0" y="280.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="exclusivegateway6" id="BPMNShape_exclusivegateway6">
         <omgdc:Bounds height="40.0" width="40.0" x="1444.0" y="277.0"></omgdc:Bounds>
@@ -451,17 +446,17 @@ Sa adresom ${prijavaZaMejl.adresaPodnosiocaPrijave}, obavestavamo Vas da ste usp
       <bpmndi:BPMNShape bpmnElement="signalintermediatethrowevent3" id="BPMNShape_signalintermediatethrowevent3">
         <omgdc:Bounds height="35.0" width="35.0" x="830.0" y="280.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="endevent8" id="BPMNShape_endevent8">
-        <omgdc:Bounds height="35.0" width="35.0" x="935.0" y="756.0"></omgdc:Bounds>
+      <bpmndi:BPMNShape bpmnElement="timerintermediatecatchevent3" id="BPMNShape_timerintermediatecatchevent3">
+        <omgdc:Bounds height="35.0" width="35.0" x="1080.0" y="280.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="exclusivegateway10" id="BPMNShape_exclusivegateway10">
-        <omgdc:Bounds height="40.0" width="40.0" x="1353.0" y="917.0"></omgdc:Bounds>
+      <bpmndi:BPMNShape bpmnElement="endevent8" id="BPMNShape_endevent8">
+        <omgdc:Bounds height="35.0" width="35.0" x="813.0" y="744.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="servicetask3" id="BPMNShape_servicetask3">
-        <omgdc:Bounds height="81.0" width="131.0" x="1308.0" y="625.0"></omgdc:Bounds>
+        <omgdc:Bounds height="81.0" width="131.0" x="1366.0" y="623.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="usertask14" id="BPMNShape_usertask14">
-        <omgdc:Bounds height="81.0" width="118.0" x="1315.0" y="811.0"></omgdc:Bounds>
+        <omgdc:Bounds height="81.0" width="118.0" x="1373.0" y="778.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="exclusivegateway11" id="BPMNShape_exclusivegateway11">
         <omgdc:Bounds height="40.0" width="40.0" x="1590.0" y="638.0"></omgdc:Bounds>
@@ -516,9 +511,6 @@ Sa adresom ${prijavaZaMejl.adresaPodnosiocaPrijave}, obavestavamo Vas da ste usp
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="signalintermediatecatchevent2" id="BPMNShape_signalintermediatecatchevent2">
         <omgdc:Bounds height="35.0" width="35.0" x="3370.0" y="471.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="timerintermediatecatchevent2" id="BPMNShape_timerintermediatecatchevent2">
-        <omgdc:Bounds height="35.0" width="35.0" x="3490.0" y="641.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="scripttask3" id="BPMNShape_scripttask3">
         <omgdc:Bounds height="78.0" width="141.0" x="3590.0" y="619.0"></omgdc:Bounds>
@@ -581,13 +573,22 @@ Sa adresom ${prijavaZaMejl.adresaPodnosiocaPrijave}, obavestavamo Vas da ste usp
         <omgdc:Bounds height="35.0" width="35.0" x="4029.0" y="1210.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="servicetask7" id="BPMNShape_servicetask7">
-        <omgdc:Bounds height="55.0" width="105.0" x="1321.0" y="736.0"></omgdc:Bounds>
+        <omgdc:Bounds height="55.0" width="105.0" x="920.0" y="636.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="servicetask8" id="BPMNShape_servicetask8">
         <omgdc:Bounds height="91.0" width="105.0" x="1670.0" y="613.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="servicetask10" id="BPMNShape_servicetask10">
         <omgdc:Bounds height="55.0" width="105.0" x="3230.0" y="629.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway20" id="BPMNShape_exclusivegateway20">
+        <omgdc:Bounds height="40.0" width="40.0" x="1411.0" y="940.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway21" id="BPMNShape_exclusivegateway21">
+        <omgdc:Bounds height="40.0" width="40.0" x="810.0" y="644.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="timerintermediatecatchevent4" id="BPMNShape_timerintermediatecatchevent4">
+        <omgdc:Bounds height="35.0" width="35.0" x="3485.0" y="641.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
         <omgdi:waypoint x="36.0" y="253.0"></omgdi:waypoint>
@@ -605,23 +606,16 @@ Sa adresom ${prijavaZaMejl.adresaPodnosiocaPrijave}, obavestavamo Vas da ste usp
         <omgdi:waypoint x="754.0" y="683.0"></omgdi:waypoint>
         <omgdi:waypoint x="754.0" y="756.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="13.0" width="54.0" x="688.0" y="694.0"></omgdc:Bounds>
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
-        <omgdi:waypoint x="972.0" y="663.0"></omgdi:waypoint>
-        <omgdi:waypoint x="1104.0" y="664.0"></omgdi:waypoint>
-        <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="13.0" width="45.0" x="839.0" y="619.0"></omgdc:Bounds>
+          <omgdc:Bounds height="13.0" width="54.0" x="670.0" y="711.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow18" id="BPMNEdge_flow18">
-        <omgdi:waypoint x="1220.0" y="664.0"></omgdi:waypoint>
-        <omgdi:waypoint x="1308.0" y="665.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1296.0" y="665.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1366.0" y="663.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow23" id="BPMNEdge_flow23">
         <omgdi:waypoint x="774.0" y="663.0"></omgdi:waypoint>
-        <omgdi:waypoint x="932.0" y="663.0"></omgdi:waypoint>
+        <omgdi:waypoint x="810.0" y="664.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow27" id="BPMNEdge_flow27">
         <omgdi:waypoint x="1003.0" y="297.0"></omgdi:waypoint>
@@ -696,24 +690,6 @@ Sa adresom ${prijavaZaMejl.adresaPodnosiocaPrijave}, obavestavamo Vas da ste usp
       <bpmndi:BPMNEdge bpmnElement="flow146" id="BPMNEdge_flow146">
         <omgdi:waypoint x="983.0" y="277.0"></omgdi:waypoint>
         <omgdi:waypoint x="983.0" y="180.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow66" id="BPMNEdge_flow66">
-        <omgdi:waypoint x="1374.0" y="892.0"></omgdi:waypoint>
-        <omgdi:waypoint x="1373.0" y="917.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow68" id="BPMNEdge_flow68">
-        <omgdi:waypoint x="1353.0" y="937.0"></omgdi:waypoint>
-        <omgdi:waypoint x="1161.0" y="936.0"></omgdi:waypoint>
-        <omgdi:waypoint x="1162.0" y="698.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow69" id="BPMNEdge_flow69">
-        <omgdi:waypoint x="1393.0" y="937.0"></omgdi:waypoint>
-        <omgdi:waypoint x="1608.0" y="934.0"></omgdi:waypoint>
-        <omgdi:waypoint x="1610.0" y="678.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow73" id="BPMNEdge_flow73">
-        <omgdi:waypoint x="952.0" y="683.0"></omgdi:waypoint>
-        <omgdi:waypoint x="952.0" y="756.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow77" id="BPMNEdge_flow77">
         <omgdi:waypoint x="1884.0" y="330.0"></omgdi:waypoint>
@@ -811,10 +787,10 @@ Sa adresom ${prijavaZaMejl.adresaPodnosiocaPrijave}, obavestavamo Vas da ste usp
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow101" id="BPMNEdge_flow101">
         <omgdi:waypoint x="3410.0" y="658.0"></omgdi:waypoint>
-        <omgdi:waypoint x="3490.0" y="658.0"></omgdi:waypoint>
+        <omgdi:waypoint x="3485.0" y="658.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow102" id="BPMNEdge_flow102">
-        <omgdi:waypoint x="3525.0" y="658.0"></omgdi:waypoint>
+        <omgdi:waypoint x="3520.0" y="658.0"></omgdi:waypoint>
         <omgdi:waypoint x="3590.0" y="658.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow103" id="BPMNEdge_flow103">
@@ -847,7 +823,7 @@ Sa adresom ${prijavaZaMejl.adresaPodnosiocaPrijave}, obavestavamo Vas da ste usp
         <omgdi:waypoint x="3534.0" y="780.0"></omgdi:waypoint>
         <omgdi:waypoint x="3282.0" y="684.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="52.0" width="100.0" x="3318.0" y="718.0"></omgdc:Bounds>
+          <omgdc:Bounds height="39.0" width="100.0" x="3318.0" y="718.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow114" id="BPMNEdge_flow114">
@@ -905,14 +881,6 @@ Sa adresom ${prijavaZaMejl.adresaPodnosiocaPrijave}, obavestavamo Vas da ste usp
         <omgdi:waypoint x="1685.0" y="345.0"></omgdi:waypoint>
         <omgdi:waypoint x="1864.0" y="350.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow129" id="BPMNEdge_flow129">
-        <omgdi:waypoint x="1373.0" y="706.0"></omgdi:waypoint>
-        <omgdi:waypoint x="1373.0" y="736.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow130" id="BPMNEdge_flow130">
-        <omgdi:waypoint x="1373.0" y="791.0"></omgdi:waypoint>
-        <omgdi:waypoint x="1374.0" y="811.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow131" id="BPMNEdge_flow131">
         <omgdi:waypoint x="1775.0" y="658.0"></omgdi:waypoint>
         <omgdi:waypoint x="1850.0" y="658.0"></omgdi:waypoint>
@@ -921,7 +889,7 @@ Sa adresom ${prijavaZaMejl.adresaPodnosiocaPrijave}, obavestavamo Vas da ste usp
         <omgdi:waypoint x="1610.0" y="638.0"></omgdi:waypoint>
         <omgdi:waypoint x="1097.0" y="591.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="13.0" width="47.0" x="1502.0" y="616.0"></omgdc:Bounds>
+          <omgdc:Bounds height="13.0" width="47.0" x="1524.0" y="630.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow135" id="BPMNEdge_flow135">
@@ -935,6 +903,36 @@ Sa adresom ${prijavaZaMejl.adresaPodnosiocaPrijave}, obavestavamo Vas da ste usp
       <bpmndi:BPMNEdge bpmnElement="flow148" id="BPMNEdge_flow148">
         <omgdi:waypoint x="3335.0" y="656.0"></omgdi:waypoint>
         <omgdi:waypoint x="3370.0" y="658.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow149" id="BPMNEdge_flow149">
+        <omgdi:waypoint x="1431.0" y="704.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1432.0" y="778.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow152" id="BPMNEdge_flow152">
+        <omgdi:waypoint x="1025.0" y="663.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1180.0" y="665.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow153" id="BPMNEdge_flow153">
+        <omgdi:waypoint x="1432.0" y="859.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1431.0" y="940.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow154" id="BPMNEdge_flow154">
+        <omgdi:waypoint x="1411.0" y="960.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1238.0" y="960.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1238.0" y="699.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow155" id="BPMNEdge_flow155">
+        <omgdi:waypoint x="1451.0" y="960.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1610.0" y="959.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1610.0" y="678.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow156" id="BPMNEdge_flow156">
+        <omgdi:waypoint x="830.0" y="684.0"></omgdi:waypoint>
+        <omgdi:waypoint x="830.0" y="744.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow157" id="BPMNEdge_flow157">
+        <omgdi:waypoint x="850.0" y="664.0"></omgdi:waypoint>
+        <omgdi:waypoint x="920.0" y="663.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
         <omgdi:waypoint x="222.0" y="253.0"></omgdi:waypoint>

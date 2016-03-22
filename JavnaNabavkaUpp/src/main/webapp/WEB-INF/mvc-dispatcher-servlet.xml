@@ -101,4 +101,6 @@
 		class="activiti.spring.javnaNabavka.springweb.persistence.services.PonudjacService" />
 	<bean id="BaciPorukuService"
 		class="activiti.spring.javnaNabavka.springweb.services.BaciPorukuService" />
+	<bean id="PokupiPonudjace"
+		class="activiti.spring.javnaNabavka.springweb.services.PokupiPonudjace" />
 </beans>

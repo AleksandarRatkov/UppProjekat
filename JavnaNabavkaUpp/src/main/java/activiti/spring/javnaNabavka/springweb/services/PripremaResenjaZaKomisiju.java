@@ -27,7 +27,6 @@ public class PripremaResenjaZaKomisiju implements JavaDelegate {
 				.list();
 		List<String> clanoviKomisije = new ArrayList<String>();
 
-		List<User> adekvatniPonudjaci = identityService.createUserQuery().memberOfGroup("ponudjac").list();
 		
 		clanoviKomisije.add(pravnik.getId());
 		execution.setVariable("clan1", pravnik.getFirstName() + " " + pravnik.getLastName());
@@ -46,8 +45,7 @@ public class PripremaResenjaZaKomisiju implements JavaDelegate {
 				}
 
 				execution.setVariable("clanoviKomisije", clanoviKomisije);
-				execution.setVariable("adekvatniPonudjaci", adekvatniPonudjaci);
-				System.out.println("Adekvatni ponudjaci su : " + adekvatniPonudjaci);
+				
 			}
 		}
 	}
