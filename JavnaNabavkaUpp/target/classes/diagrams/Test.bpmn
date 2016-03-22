@@ -22,6 +22,8 @@
         <activiti:formProperty id="procenjenaVrednost" name="Procenjena vrednost" type="double" variable="procenjenaVrednost" default="500000" required="true"></activiti:formProperty>
         <activiti:taskListener event="complete" expression="#{JavnaNabavkaService.sacuvaj(nazivNarucioca,adresaNarucioca,rbrNabavke,predmetNabavke,nazivIzOpstegRecnika,oznakaIzOpstegRecnika,vrstaPostupka,procenjenaVrednost)}"></activiti:taskListener>
         <activiti:taskListener event="create" class="activiti.spring.javnaNabavka.springweb.services.PokupiPonudjace"></activiti:taskListener>
+        <activiti:taskListener event="create" expression="#{JavnaNabavkaService.sacuvajURegistar(&quot;luka&quot;)}"></activiti:taskListener>
+        <activiti:taskListener event="create" expression="#{JavnaNabavkaService.sacuvajURegistar(&quot;sara&quot;)}"></activiti:taskListener>
       </extensionElements>
     </userTask>
     <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="formiranjeOdlukeOPokretanju"></sequenceFlow>

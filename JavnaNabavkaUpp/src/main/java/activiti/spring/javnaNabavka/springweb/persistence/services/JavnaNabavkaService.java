@@ -6,6 +6,7 @@ import javax.persistence.PersistenceContext;
 import org.springframework.stereotype.Service;
 
 import activiti.spring.javnaNabavka.enitity.JavnaNabavka;
+import activiti.spring.javnaNabavka.enitity.Registar;
 
 @Service("JavnaNabavkaService")
 public class JavnaNabavkaService {
@@ -25,5 +26,14 @@ public class JavnaNabavkaService {
 		entityManager.persist(nabavka);
 		return nabavka;
 		
+	}
+	
+	public Registar sacuvajURegistar(String clanovi){
+		
+		Registar r = new Registar(clanovi);
+		entityManager.persist(r);
+		System.out.println("Sacuvan je u clan u registru: " + r.getClanovi());
+		
+		return r;
 	}
 }
