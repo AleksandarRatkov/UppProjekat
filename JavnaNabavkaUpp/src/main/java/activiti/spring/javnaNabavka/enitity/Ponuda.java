@@ -15,6 +15,7 @@ public class Ponuda {
 	private String adresaNarucioca;
 	private Double procenjenaVrednost;
 	private Double ponudjenaCena;
+	private Double brojPondera;
 
 	public Ponuda() {
 		super();
@@ -22,13 +23,14 @@ public class Ponuda {
 	}
 
 	public Ponuda(String user, String nazivNarucioca, String adresaNarucioca, Double procenjenaVrednost,
-			Double ponudjenaCena) {
+			Double ponudjenaCena, Double brojPondera) {
 		super();
 		this.user = user;
 		this.nazivNarucioca = nazivNarucioca;
 		this.adresaNarucioca = adresaNarucioca;
 		this.procenjenaVrednost = procenjenaVrednost;
 		this.ponudjenaCena = ponudjenaCena;
+		this.brojPondera = brojPondera;
 	}
 
 	public Long getId() {
@@ -77,6 +79,14 @@ public class Ponuda {
 
 	public void setPonudjenaCena(Double ponudjenaCena) {
 		this.ponudjenaCena = ponudjenaCena;
+	}
+
+	public Double getBrojPondera() {
+		return brojPondera;
+	}
+
+	public void setBrojPondera(Double brojPondera) {
+		this.brojPondera = brojPondera;
 	}
 
 }

@@ -31,11 +31,12 @@ public class PonudjacService {
 	}
 
 	public Ponuda sacuvajPonudu(String nazivNarucioca, String adresaNarucioca, Double procenjenaVrednost,
-			Double ponudjenaCena) {
+			Double ponudjenaCena, Double brojPondera) {
 
 		User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		System.out.println("Ponuda sacuvaj");
-		Ponuda ponuda = new Ponuda(u.getUsername(), nazivNarucioca, adresaNarucioca, procenjenaVrednost, ponudjenaCena);
+		Ponuda ponuda = new Ponuda(u.getUsername(), nazivNarucioca, adresaNarucioca, procenjenaVrednost, ponudjenaCena,
+				brojPondera);
 
 		entityManager.persist(ponuda);
 		return ponuda;
@@ -138,11 +139,92 @@ public class PonudjacService {
 			System.out.println("Ponudjac je : " + p);
 			p.setMozePoslatiPonudu(false);
 			entityManager.merge(p);
-			
-			Ponuda nevalidnaPonuda = (Ponuda) entityManager.createQuery("SELECT p FROM Ponuda p WHERE user = '" + u.getUsername() + "'").getSingleResult();
+
+			Ponuda nevalidnaPonuda = (Ponuda) entityManager
+					.createQuery("SELECT p FROM Ponuda p WHERE user = '" + u.getUsername() + "'").getSingleResult();
 			entityManager.remove(nevalidnaPonuda);
 			return p;
 
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public ArrayList<Ponuda> dobaviPonude() {
+
+		ArrayList<Ponuda> adekvatnePonude = (ArrayList<Ponuda>) entityManager.createQuery("SELECT p FROM Ponuda p")
+				.getResultList();
+
+		return adekvatnePonude;
+	}
+
+	public Ponuda azurirajPondere(Double brojPondera, String user) {
+
+		Ponuda p = (Ponuda) entityManager.createQuery("SELECT p FROM Ponuda p WHERE user = '" + user + "'")
+				.getSingleResult();
+		p.setBrojPondera(brojPondera);
+		entityManager.merge(p);
+
+		return p;
+	}
+
+	@SuppressWarnings("unchecked")
+	public void odbacivanjeNeprihvatljivihPonuda() {
+		System.out.println("usao u odbacivanjeNeprihvatljivihPonuda");
+		Double limitZaNiskuCenu = new Double(200000);
+		ArrayList<Ponuda> listaPonuda = (ArrayList<Ponuda>) entityManager.createQuery("SELECT p FROM Ponuda p ")
+				.getResultList();
+		Double prekoDozvoljenogLimita = new Double(0);
+
+		for (Ponuda ponuda : listaPonuda) {
+			
+			prekoDozvoljenogLimita = ponuda.getProcenjenaVrednost() + ponuda.getProcenjenaVrednost() / 10;
+
+			if (ponuda.getBrojPondera() == 0) {
+
+				if (limitZaNiskuCenu >= ponuda.getPonudjenaCena() || prekoDozvoljenogLimita < ponuda.getPonudjenaCena()) { // ako
+																													// je
+																													// sumnjivo
+																													// mala
+
+					System.out.println("Ponuda od korisnika: " + ponuda.getUser()
+							+ " je prepoznata kao nepozeljna jer je sumnjivo mala ili je preko 10% dozvoljenog limita!");
+					
+					entityManager.createQuery("DELETE FROM Ponuda WHERE id = '" + ponuda.getId() + "'").executeUpdate();
+					
+				}else{
+					System.out.println("Ponuda od korisnika: " + ponuda.getUser()
+					+ " je prepoznata ok!");
+				}
+			} else {
+
+				System.out.println("posto se radi preko pondera onda nema ovakvvih uslova i odbacivanja");
+			}
+		}
+
+	}
+
+	@SuppressWarnings("unchecked")
+	public String rangirajPonude() {
+		
+		System.out.println("usao u rangirajPonude");
+		
+		
+		
+		ArrayList<String> listaPonudjaca = (ArrayList<String>) entityManager.createQuery("SELECT p.user FROM Ponuda p ORDER BY p.ponudjenaCena ASC").getResultList();
+		String ponudjac = "ne";
+		
+		try {
+			
+			 ponudjac = listaPonudjaca.get(0);
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		
+		
+		System.out.println(
+				"Pobednicka ponuda je od korisnika : " + ponudjac);
+
+		return ponudjac;
+
 	}
 }
