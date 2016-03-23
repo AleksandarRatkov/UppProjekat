@@ -31,6 +31,7 @@ public class SastavljanjeClanovaKomisijeServis implements TaskListener{
 		}
 		
 		execution.setVariable("brojPotvrdjenihClanova", brojPotvrdjenihClanova);
+		execution.setVariable("istekaoTajmer", false);
 	}
 	
 }

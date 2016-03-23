@@ -33,6 +33,7 @@ public class BaciPorukuService implements JavaDelegate{
 		mapaVarijabli.put("internetStranicaNarucioca", internetStranicaNarucioca);
 		mapaVarijabli.put("opisPredmetaNabavke", opisPredmetaNabavke);
 		
+		execution.setVariable("istekaoTajmer1", false);
 		runtimeService.startProcessInstanceByMessage("porukaZaPonudu",mapaVarijabli);
 	}
 
