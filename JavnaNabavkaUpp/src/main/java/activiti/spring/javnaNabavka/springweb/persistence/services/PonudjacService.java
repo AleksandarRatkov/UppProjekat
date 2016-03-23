@@ -1,6 +1,7 @@
 package activiti.spring.javnaNabavka.springweb.persistence.services;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -78,34 +79,32 @@ public class PonudjacService {
 		return p;
 
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public void editujFlegPonudaMalaNabavka(String id) {
 		System.out.println("Usao u edit flega ponuda!");
 
 		ArrayList<Registar> poznatiPonudjaci = (ArrayList<Registar>) entityManager
-				.createQuery("SELECT r FROM Registar r")
-				.getResultList();
-		
+				.createQuery("SELECT r FROM Registar r").getResultList();
+
 		ArrayList<Ponudjac> adekvatniKorisnici = (ArrayList<Ponudjac>) entityManager
 				.createQuery("SELECT p FROM Ponudjac p ").getResultList();
-		
+
 		for (Ponudjac ponudjac : adekvatniKorisnici) {
-			
-			Ponudjac p = (Ponudjac) entityManager.createQuery("SELECT p FROM Ponudjac p WHERE id = '" + ponudjac.getId() + "'")
-					.getSingleResult();
+
+			Ponudjac p = (Ponudjac) entityManager
+					.createQuery("SELECT p FROM Ponudjac p WHERE id = '" + ponudjac.getId() + "'").getSingleResult();
 			p.setMozePoslatiPonudu(false);
 			entityManager.merge(p);
 		}
-		
+
 		for (Registar reg : poznatiPonudjaci) {
-			
-				Ponudjac p = (Ponudjac) entityManager.createQuery("SELECT p FROM Ponudjac p WHERE id = '" + reg.getClanovi() + "'")
-						.getSingleResult();
-				p.setMozePoslatiPonudu(true);
-				entityManager.merge(p);
+
+			Ponudjac p = (Ponudjac) entityManager
+					.createQuery("SELECT p FROM Ponudjac p WHERE id = '" + reg.getClanovi() + "'").getSingleResult();
+			p.setMozePoslatiPonudu(true);
+			entityManager.merge(p);
 		}
-		
 
 	}
 
@@ -206,51 +205,54 @@ public class PonudjacService {
 		Double prekoDozvoljenogLimita = new Double(0);
 
 		for (Ponuda ponuda : listaPonuda) {
-			
+
 			prekoDozvoljenogLimita = ponuda.getProcenjenaVrednost() + ponuda.getProcenjenaVrednost() / 10;
 
-			
+			if (limitZaNiskuCenu >= ponuda.getPonudjenaCena() || prekoDozvoljenogLimita < ponuda.getPonudjenaCena()) { // ako
+				// je
+				// sumnjivo
+				// mala
 
-				if (limitZaNiskuCenu >= ponuda.getPonudjenaCena() || prekoDozvoljenogLimita < ponuda.getPonudjenaCena()) { // ako
-																													// je
-																													// sumnjivo
-																													// mala
+				System.out.println("Ponuda od korisnika: " + ponuda.getUser()
+						+ " je prepoznata kao nepozeljna jer je sumnjivo mala ili je preko 10% dozvoljenog limita!");
 
-					System.out.println("Ponuda od korisnika: " + ponuda.getUser()
-							+ " je prepoznata kao nepozeljna jer je sumnjivo mala ili je preko 10% dozvoljenog limita!");
-					
-					entityManager.createQuery("DELETE FROM Ponuda WHERE id = '" + ponuda.getId() + "'").executeUpdate();
-					
-				}else{
-					System.out.println("Ponuda od korisnika: " + ponuda.getUser()
-					+ " je prepoznata ok!");
-				}
+				entityManager.createQuery("DELETE FROM Ponuda WHERE id = '" + ponuda.getId() + "'").executeUpdate();
+
+			} else {
+				System.out.println("Ponuda od korisnika: " + ponuda.getUser() + " je prepoznata ok!");
+			}
 		}
 
 	}
 
 	@SuppressWarnings("unchecked")
 	public String rangirajPonude() {
-		
+
 		System.out.println("usao u rangirajPonude");
-		
-		
-		
-		ArrayList<String> listaPonudjaca = (ArrayList<String>) entityManager.createQuery("SELECT p.user FROM Ponuda p ORDER BY p.ponudjenaCena ASC").getResultList();
+
+		ArrayList<String> listaPonudjaca = (ArrayList<String>) entityManager
+				.createQuery("SELECT p.user FROM Ponuda p ORDER BY p.ponudjenaCena ASC").getResultList();
 		String ponudjac = "ne";
-		
+
 		try {
-			
-			 ponudjac = listaPonudjaca.get(0);
+
+			ponudjac = listaPonudjaca.get(0);
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
-		
-		
-		System.out.println(
-				"Pobednicka ponuda je od korisnika : " + ponudjac);
+
+		System.out.println("Pobednicka ponuda je od korisnika : " + ponudjac);
 
 		return ponudjac;
 
+	}
+
+	public boolean rezultatZastitePrava() {
+		System.out.println("Uslo se u rezultatZastitePrava!!!");
+		Random r = new Random();
+		
+		boolean rez =  r.nextBoolean();
+		System.out.println("Rezultat zastitte prava je : " + rez);
+		return rez;
 	}
 }

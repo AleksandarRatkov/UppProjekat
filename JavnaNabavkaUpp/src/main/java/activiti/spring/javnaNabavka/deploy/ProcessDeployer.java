@@ -17,6 +17,8 @@ public class ProcessDeployer {
 	private static final String procesJavneNabavke = "diagrams/JavnaNabavka.bpmn";
 	private static final String slanjePrijave = "diagrams/SlanjePrijave.bpmn";
 	private static final String slanjePonude = "diagrams/SlanjePonuda.bpmn";
+	private static final String pregledZastitePrava = "diagrams/pregledZastitePrava.bpmn";
+	private static final String zastitaPrava = "diagrams/zastitaPrava.bpmn";
 	private static Scanner scanner;
 
 	public static void main (String[] args){
@@ -39,8 +41,11 @@ public class ProcessDeployer {
 
 		repositoryService.createDeployment().addClasspathResource(slanjePrijave).deploy();
 		
+		repositoryService.createDeployment().addClasspathResource(pregledZastitePrava).deploy();
+		
 		repositoryService.createDeployment().addClasspathResource(slanjePonude).deploy();
 		
+		repositoryService.createDeployment().addClasspathResource(zastitaPrava).deploy();
 			System.out.println("Ukupan broj deployment-a: " + repositoryService.createDeploymentQuery().count());
 		}
 	}

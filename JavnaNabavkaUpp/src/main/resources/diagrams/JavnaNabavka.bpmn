@@ -4,6 +4,7 @@
   <signal id="signalSlanjePrijave" name="signalSlanjePrijave" activiti:scope="global"></signal>
   <signal id="signalObjavaPozivaZaPonude" name="signalObjavaPozivaZaPonude" activiti:scope="global"></signal>
   <signal id="signalSlanjaPonude" name="signalSlanjaPonude" activiti:scope="global"></signal>
+  <signal id="baciZastituPrava" name="baciZastituPrava" activiti:scope="global"></signal>
   <process id="ProcesJavneNabavke" name="ProcesJavneNabavke" isExecutable="true">
     <startEvent id="startevent1" name="Start" activiti:initiator="${narucilac}" activiti:formKey="startForm"></startEvent>
     <userTask id="formiranjeOdlukeOPokretanju" name="Formiranje odluke o pokretanju postupka" activiti:candidateGroups="narucilac" activiti:formKey="executeTask">
@@ -405,6 +406,15 @@ Dostavljamo Vam zapisnik namenjen ponudjacima]]></activiti:expression>
       <sequenceFlow id="flow172" sourceRef="servicetask16" targetRef="usertask19"></sequenceFlow>
     </subProcess>
     <sequenceFlow id="flow2" sourceRef="formiranjeOdlukeOPokretanju" targetRef="subprocess1"></sequenceFlow>
+    <callActivity id="callactivity1" name="Zastita prava" calledElement="pregledZastitePrava">
+      <extensionElements>
+        <activiti:in source="procesDefId" target="procesDefId"></activiti:in>
+      </extensionElements>
+    </callActivity>
+    <boundaryEvent id="boundarysignal1" name="Signal" attachedToRef="subprocess1" cancelActivity="false">
+      <signalEventDefinition signalRef="baciZastituPrava"></signalEventDefinition>
+    </boundaryEvent>
+    <sequenceFlow id="flow173" sourceRef="boundarysignal1" targetRef="callactivity1"></sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_ProcesJavneNabavke">
     <bpmndi:BPMNPlane bpmnElement="ProcesJavneNabavke" id="BPMNPlane_ProcesJavneNabavke">
@@ -635,6 +645,12 @@ Dostavljamo Vam zapisnik namenjen ponudjacima]]></activiti:expression>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="servicetask16" id="BPMNShape_servicetask16">
         <omgdc:Bounds height="75.0" width="136.0" x="2526.0" y="814.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="boundarysignal1" id="BPMNShape_boundarysignal1">
+        <omgdc:Bounds height="30.0" width="30.0" x="720.0" y="2070.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="callactivity1" id="BPMNShape_callactivity1">
+        <omgdc:Bounds height="55.0" width="105.0" x="722.0" y="2153.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
         <omgdi:waypoint x="36.0" y="253.0"></omgdi:waypoint>
@@ -993,6 +1009,10 @@ Dostavljamo Vam zapisnik namenjen ponudjacima]]></activiti:expression>
       <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
         <omgdi:waypoint x="222.0" y="253.0"></omgdi:waypoint>
         <omgdi:waypoint x="470.0" y="1085.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow173" id="BPMNEdge_flow173">
+        <omgdi:waypoint x="735.0" y="2100.0"></omgdi:waypoint>
+        <omgdi:waypoint x="774.0" y="2153.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

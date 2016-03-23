@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.activiti.engine.FormService;
+import org.activiti.engine.HistoryService;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
@@ -12,6 +13,8 @@ import org.activiti.engine.TaskService;
 import org.activiti.engine.form.FormProperty;
 import org.activiti.engine.form.StartFormData;
 import org.activiti.engine.form.TaskFormData;
+import org.activiti.engine.history.HistoricActivityInstance;
+import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.task.Task;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +46,9 @@ public class ApplicationController {
 	@Autowired
 	private IdentityService identityService;
 	
-
+	@Autowired
+	private HistoryService historyService;
+	
 	@RequestMapping(value = "/tasksList", method = RequestMethod.GET)
 	public String showUsersTasks(ModelMap model) {
 
@@ -213,6 +218,7 @@ public class ApplicationController {
 			return "redirect:/login";
 		
 		
+		runtimeService.startProcessInstanceByKey("zastitaPrava");
 
 		ProcessDefinition procDef = repositoryService
 				.createProcessDefinitionQuery()
@@ -221,7 +227,8 @@ public class ApplicationController {
 		
 		StartFormData formData = formService.getStartFormData(procDef.getId());
 		List<FormProperty> formProperties = formData.getFormProperties();
-
+		
+		
 		if (formProperties.size() == 0) {
 			identityService.setAuthenticatedUserId("initiator");
 			runtimeService.startProcessInstanceByKey("ProcesJavneNabavke");
@@ -261,6 +268,39 @@ public class ApplicationController {
 		model.addAttribute("message", message);
 		return printWelcome(model);
 
+	}
+	
+	@RequestMapping(value = "/seeHistory", method = RequestMethod.GET)
+	public String seeHistory(ModelMap model,
+			@RequestParam Map<String, String> params) {
+
+		 User user;
+	        try{
+	            user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+	        }
+	        catch(Exception ex){
+	            return "redirect:/login";
+	        }
+	 
+	        List<String> finishedInstances = new ArrayList<String>();
+	        List<String> unfinishedInstances = new ArrayList<String>();
+	        List<String> taskOnWait = new ArrayList<String>();
+	       
+	        for (HistoricActivityInstance hai: historyService.createHistoricActivityInstanceQuery().finished().list())
+	                finishedInstances.add(hai.getId() + " - " + hai.getActivityName() + " - " + hai.getEndTime().toString());
+	       
+	        for (HistoricActivityInstance hai: historyService.createHistoricActivityInstanceQuery().unfinished().list())
+	                unfinishedInstances.add(hai.getId() + " - " + hai.getActivityName() + " - " + hai.getStartTime().toString());
+	       
+	        for (HistoricTaskInstance hti: historyService.createHistoricTaskInstanceQuery().orderByTaskAssignee().asc().list())
+	            taskOnWait.add(hti.getId() + " - " + hti.getName() + " - " + hti.getAssignee());
+	               
+	        model.addAttribute("finishedInstances", finishedInstances);
+	        model.addAttribute("unfinishedInstances", unfinishedInstances);
+	        model.addAttribute("taskOnWait", taskOnWait);
+	        model.addAttribute("username", user.getUsername());
+	       
+	        return "application/seeHistory";
 	}
 
 	@RequestMapping(value = "/welcome", method = RequestMethod.GET)

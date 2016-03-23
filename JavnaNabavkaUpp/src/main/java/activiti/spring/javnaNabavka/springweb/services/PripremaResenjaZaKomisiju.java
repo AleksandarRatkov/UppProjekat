@@ -48,5 +48,7 @@ public class PripremaResenjaZaKomisiju implements JavaDelegate {
 				execution.setVariable("internetAdresaKonkursneDokumentacije", "www.konkurs.com");
 			}
 		}
+		
+			execution.setVariable("procesDefId", execution.getProcessDefinitionId());
 	}
 }

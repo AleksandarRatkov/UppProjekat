@@ -43,6 +43,8 @@
 	<hr>
 	<c:if test="${narucilac==true}" > <a href="./newInstance">Pokretanje nove instance</a> <br/> <hr></c:if>
 	
+	<a href="./seeHistory">Pregled istorije zadataka</a> <br/>
+	<hr>
 	
 	<br />
 	<a href="<c:url value="/j_spring_security_logout" />"> Logout</a>
