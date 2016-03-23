@@ -1,5 +1,6 @@
 package activiti.spring.javnaNabavka.springweb.controllers;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -273,8 +274,19 @@ public class ApplicationController {
 			return "redirect:/login";
 		}
 
+		boolean narucilac = false;
+		
+		ArrayList<org.activiti.engine.identity.User> korisnik = (ArrayList<org.activiti.engine.identity.User>) identityService.createUserQuery().memberOfGroup("narucilac").list();
+		for (org.activiti.engine.identity.User u : korisnik) {
+			if( u.getId().equals(user.getUsername()) ){
+				narucilac = true;
+			}
+		}
+		
 		String name = user.getUsername();
+		
 		model.addAttribute("username", name);
+		model.addAttribute("narucilac",narucilac);
 		return "application/welcome";
 
 	}
