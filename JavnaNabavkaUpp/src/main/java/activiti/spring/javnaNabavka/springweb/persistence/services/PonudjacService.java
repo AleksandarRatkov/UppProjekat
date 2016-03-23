@@ -78,6 +78,36 @@ public class PonudjacService {
 		return p;
 
 	}
+	
+	@SuppressWarnings("unchecked")
+	public void editujFlegPonudaMalaNabavka(String id) {
+		System.out.println("Usao u edit flega ponuda!");
+
+		ArrayList<Registar> poznatiPonudjaci = (ArrayList<Registar>) entityManager
+				.createQuery("SELECT r FROM Registar r")
+				.getResultList();
+		
+		ArrayList<Ponudjac> adekvatniKorisnici = (ArrayList<Ponudjac>) entityManager
+				.createQuery("SELECT p FROM Ponudjac p ").getResultList();
+		
+		for (Ponudjac ponudjac : adekvatniKorisnici) {
+			
+			Ponudjac p = (Ponudjac) entityManager.createQuery("SELECT p FROM Ponudjac p WHERE id = '" + ponudjac.getId() + "'")
+					.getSingleResult();
+			p.setMozePoslatiPonudu(false);
+			entityManager.merge(p);
+		}
+		
+		for (Registar reg : poznatiPonudjaci) {
+			
+				Ponudjac p = (Ponudjac) entityManager.createQuery("SELECT p FROM Ponudjac p WHERE id = '" + reg.getClanovi() + "'")
+						.getSingleResult();
+				p.setMozePoslatiPonudu(true);
+				entityManager.merge(p);
+		}
+		
+
+	}
 
 	public ArrayList<String> vratiKvalifikovanePonudjace() {
 		System.out.println("usao u vratiKvalifikovanePonudjace");
@@ -179,7 +209,7 @@ public class PonudjacService {
 			
 			prekoDozvoljenogLimita = ponuda.getProcenjenaVrednost() + ponuda.getProcenjenaVrednost() / 10;
 
-			if (ponuda.getBrojPondera() == 0) {
+			
 
 				if (limitZaNiskuCenu >= ponuda.getPonudjenaCena() || prekoDozvoljenogLimita < ponuda.getPonudjenaCena()) { // ako
 																													// je
@@ -195,10 +225,6 @@ public class PonudjacService {
 					System.out.println("Ponuda od korisnika: " + ponuda.getUser()
 					+ " je prepoznata ok!");
 				}
-			} else {
-
-				System.out.println("posto se radi preko pondera onda nema ovakvvih uslova i odbacivanja");
-			}
 		}
 
 	}

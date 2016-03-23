@@ -30,6 +30,7 @@ public class SastavljanjeClanovaKomisijeServis implements TaskListener{
 			System.out.println("**++");
 		}
 		
+		System.out.println("brojPotvrdjenihClanova : " + brojPotvrdjenihClanova);
 		execution.setVariable("brojPotvrdjenihClanova", brojPotvrdjenihClanova);
 		execution.setVariable("istekaoTajmer", false);
 	}

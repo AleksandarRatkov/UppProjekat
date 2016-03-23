@@ -19,7 +19,6 @@
         <activiti:formProperty id="oznakaIzOpstegRecnika" name="Oznaka iz opsteg recnika" type="string" variable="oznakaIzOpstegRecnika" default="12a" required="true"></activiti:formProperty>
         <activiti:formProperty id="vrstaPostupka" name="Vrsta postupka" type="enum" variable="vrstaPostupka" required="true">
           <activiti:value id="restriktivniPostupak" name="Restriktivni postupak"></activiti:value>
-          <activiti:value id="nabavkaMaleVrednosti" name="Nabavka male vrednosti"></activiti:value>
           <activiti:value id="otvoreniPostupak" name="Otvoreni postupak"></activiti:value>
         </activiti:formProperty>
         <activiti:formProperty id="procenjenaVrednost" name="Procenjena vrednost" type="double" variable="procenjenaVrednost" default="500000" required="true"></activiti:formProperty>
@@ -28,6 +27,7 @@
         <activiti:taskListener event="create" class="activiti.spring.javnaNabavka.springweb.services.PokupiPonudjace"></activiti:taskListener>
         <activiti:taskListener event="create" expression="#{JavnaNabavkaService.sacuvajURegistar(&quot;luka&quot;)}"></activiti:taskListener>
         <activiti:taskListener event="create" expression="#{JavnaNabavkaService.sacuvajURegistar(&quot;sara&quot;)}"></activiti:taskListener>
+        <activiti:taskListener event="create" expression="#{JavnaNabavkaService.sacuvajURegistar(&quot;lara&quot;)}"></activiti:taskListener>
       </extensionElements>
     </userTask>
     <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="formiranjeOdlukeOPokretanju"></sequenceFlow>
@@ -57,7 +57,6 @@
       <subProcess id="subprocess2" name="restriktivni postupak - kvalifikacija">
         <startEvent id="startevent3" name="Start"></startEvent>
         <eventBasedGateway id="eventgateway1" name="Exclusive Gateway"></eventBasedGateway>
-        <sequenceFlow id="flow27" sourceRef="eventgateway1" targetRef="tajmerZaPrijave3"></sequenceFlow>
         <sequenceFlow id="flow30" sourceRef="servicetask2" targetRef="mailtask1"></sequenceFlow>
         <exclusiveGateway id="exclusivegateway6" name="Exclusive Gateway"></exclusiveGateway>
         <sequenceFlow id="flow32" sourceRef="mailtask1" targetRef="exclusivegateway6"></sequenceFlow>
@@ -146,7 +145,6 @@ Sa adresom ${prijavaZaMejl.adresaPodnosiocaPrijave}, obavestavamo Vas da ste usp
           <signalEventDefinition signalRef="signalSlanjePrijave"></signalEventDefinition>
         </intermediateCatchEvent>
         <sequenceFlow id="flow53" sourceRef="signalintermediatecatchevent1" targetRef="servicetask2"></sequenceFlow>
-        <sequenceFlow id="flow62" sourceRef="tajmerZaPrijave3" targetRef="azuriranjeTajmera"></sequenceFlow>
         <sequenceFlow id="flow63" sourceRef="azuriranjeTajmera" targetRef="exclusivegateway6"></sequenceFlow>
         <scriptTask id="azuriranjeTajmera" name="Azuriranje tajmera" scriptFormat="javascript" activiti:autoStoreVariables="false">
           <script>execution.setVariable("istekaoTajmer", "true");</script>
@@ -176,12 +174,14 @@ Sa adresom ${prijavaZaMejl.adresaPodnosiocaPrijave}, obavestavamo Vas da ste usp
         </sequenceFlow>
         <sequenceFlow id="flow145" sourceRef="servicetask14" targetRef="signalintermediatethrowevent3"></sequenceFlow>
         <sequenceFlow id="flow146" sourceRef="eventgateway1" targetRef="signalintermediatecatchevent1"></sequenceFlow>
-        <intermediateCatchEvent id="tajmerZaPrijave3" name="tajmerZaPrijave3">
+        <serviceTask id="servicetask14" name="Postavljanje tajmera" activiti:expression="#{PostavljanjeTajmeraService.setujTajmer()}" activiti:resultVariableName="vreme"></serviceTask>
+        <intermediateCatchEvent id="tajmerZaPrijave" name="tajmerZaPrijave">
           <timerEventDefinition>
             <timeDate>${vreme}</timeDate>
           </timerEventDefinition>
         </intermediateCatchEvent>
-        <serviceTask id="servicetask14" name="Postavljanje tajmera" activiti:expression="#{PostavljanjeTajmeraService.setujTajmer()}" activiti:resultVariableName="vreme"></serviceTask>
+        <sequenceFlow id="flow170" sourceRef="eventgateway1" targetRef="tajmerZaPrijave"></sequenceFlow>
+        <sequenceFlow id="flow171" sourceRef="tajmerZaPrijave" targetRef="azuriranjeTajmera"></sequenceFlow>
       </subProcess>
       <endEvent id="endevent8" name="End"></endEvent>
       <serviceTask id="servicetask3" name="Procesiranje resenja i slanje komisiji" activiti:class="activiti.spring.javnaNabavka.springweb.services.PripremaResenjaZaKomisiju"></serviceTask>
@@ -243,13 +243,11 @@ Sa adresom ${prijavaZaMejl.adresaPodnosiocaPrijave}, obavestavamo Vas da ste usp
       <exclusiveGateway id="exclusivegateway14" name="Exclusive Gateway"></exclusiveGateway>
       <sequenceFlow id="flow89" sourceRef="parallelgateway2" targetRef="exclusivegateway14"></sequenceFlow>
       <sequenceFlow id="flow90" sourceRef="exclusivegateway14" targetRef="parallelgateway3">
-        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${vrstaPostupka!='nabavkaMaleVrednosti'}]]></conditionExpression>
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${procenjenaVrednost>3000000}]]></conditionExpression>
       </sequenceFlow>
-      <userTask id="usertask19" name="Slanje poziva poznatim ponudjacima" activiti:candidateUsers="${clanoviKomisije}">
-        <multiInstanceLoopCharacteristics isSequential="false" activiti:collection="${poznatiPonudjaci}"></multiInstanceLoopCharacteristics>
-      </userTask>
-      <sequenceFlow id="flow91" sourceRef="exclusivegateway14" targetRef="usertask19">
-        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${vrstaPostupka=='nabavkaMaleVrednosti'}]]></conditionExpression>
+      <userTask id="usertask19" name="Slanje poziva poznatim ponudjacima" activiti:candidateUsers="${clanoviKomisije}"></userTask>
+      <sequenceFlow id="flow91" sourceRef="exclusivegateway14" targetRef="servicetask16">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${procenjenaVrednost<3000000}]]></conditionExpression>
       </sequenceFlow>
       <userTask id="usertask20" name="Objavljivanje konkursne dokumentacije" activiti:candidateUsers="${clanoviKomisije}"></userTask>
       <sequenceFlow id="flow92" sourceRef="parallelgateway3" targetRef="usertask20"></sequenceFlow>
@@ -266,8 +264,8 @@ Sa adresom ${prijavaZaMejl.adresaPodnosiocaPrijave}, obavestavamo Vas da ste usp
         <signalEventDefinition signalRef="signalSlanjaPonude"></signalEventDefinition>
       </intermediateCatchEvent>
       <sequenceFlow id="flow100" sourceRef="eventgateway2" targetRef="signalintermediatecatchevent2"></sequenceFlow>
-      <sequenceFlow id="flow101" sourceRef="eventgateway2" targetRef="tajmerZaPonude3"></sequenceFlow>
-      <sequenceFlow id="flow102" sourceRef="tajmerZaPonude3" targetRef="scripttask3"></sequenceFlow>
+      <sequenceFlow id="flow101" sourceRef="eventgateway2" targetRef="tajmerZaPonude"></sequenceFlow>
+      <sequenceFlow id="flow102" sourceRef="tajmerZaPonude" targetRef="scripttask3"></sequenceFlow>
       <scriptTask id="scripttask3" name="Azuriranje tajmera za podnosenja ponuda" scriptFormat="javascript" activiti:autoStoreVariables="false">
         <script>execution.setVariable("istekaoTajmer1","true");</script>
       </scriptTask>
@@ -380,14 +378,9 @@ Dostavljamo Vam zapisnik namenjen ponudjacima]]></activiti:expression>
       <sequenceFlow id="flow156" sourceRef="exclusivegateway21" targetRef="endevent8">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${procenjenaVrednost<400000}]]></conditionExpression>
       </sequenceFlow>
-      <sequenceFlow id="flow157" sourceRef="exclusivegateway21" targetRef="servicetask7" skipExpression="&gt;400000">
+      <sequenceFlow id="flow157" sourceRef="exclusivegateway21" targetRef="servicetask7" skipExpression="vece od 400 000">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${procenjenaVrednost>400000}]]></conditionExpression>
       </sequenceFlow>
-      <intermediateCatchEvent id="tajmerZaPonude3" name="tajmerZaPonude3">
-        <timerEventDefinition>
-          <timeDate>${vreme2}</timeDate>
-        </timerEventDefinition>
-      </intermediateCatchEvent>
       <serviceTask id="servicetask11" name="Dobavljanje ponuda" activiti:expression="#{PonudjacService.dobaviPonude()}" activiti:resultVariableName="uspesnePonude"></serviceTask>
       <sequenceFlow id="flow158" sourceRef="servicetask11" targetRef="subprocess3"></sequenceFlow>
       <serviceTask id="servicetask12" name="Odbacivanje neprihvatljivih ponuda" activiti:expression="${PonudjacService.odbacivanjeNeprihvatljivihPonuda()}"></serviceTask>
@@ -401,6 +394,15 @@ Dostavljamo Vam zapisnik namenjen ponudjacima]]></activiti:expression>
       <sequenceFlow id="flow168" sourceRef="servicetask12" targetRef="usertask26"></sequenceFlow>
       <sequenceFlow id="flow169" sourceRef="usertask26" targetRef="servicetask13"></sequenceFlow>
       <serviceTask id="servicetask15" name="Postavljanje tajmera za podnosenja ponuda" activiti:expression="#{PostavljanjeTajmeraService.setujTajmer()}" activiti:resultVariableName="vreme2"></serviceTask>
+      <intermediateCatchEvent id="tajmerZaPonude" name="tajmerZaPonude">
+        <timerEventDefinition>
+          <timeDate>${vreme2}</timeDate>
+        </timerEventDefinition>
+      </intermediateCatchEvent>
+      <serviceTask id="servicetask16" name="Pretraga poznatih ponudjaca" activiti:expression="#{PonudjacService.editujFlegPonudaMalaNabavka(adekvatniPonudjac.id)}">
+        <multiInstanceLoopCharacteristics isSequential="false" activiti:collection="adekvatniPonudjaci" activiti:elementVariable="adekvatniPonudjac"></multiInstanceLoopCharacteristics>
+      </serviceTask>
+      <sequenceFlow id="flow172" sourceRef="servicetask16" targetRef="usertask19"></sequenceFlow>
     </subProcess>
     <sequenceFlow id="flow2" sourceRef="formiranjeOdlukeOPokretanju" targetRef="subprocess1"></sequenceFlow>
   </process>
@@ -481,11 +483,11 @@ Dostavljamo Vam zapisnik namenjen ponudjacima]]></activiti:expression>
       <bpmndi:BPMNShape bpmnElement="signalintermediatethrowevent3" id="BPMNShape_signalintermediatethrowevent3">
         <omgdc:Bounds height="35.0" width="35.0" x="830.0" y="280.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="tajmerZaPrijave3" id="BPMNShape_tajmerZaPrijave3">
-        <omgdc:Bounds height="35.0" width="35.0" x="1080.0" y="280.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="servicetask14" id="BPMNShape_servicetask14">
         <omgdc:Bounds height="65.0" width="117.0" x="614.0" y="262.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="tajmerZaPrijave" id="BPMNShape_tajmerZaPrijave">
+        <omgdc:Bounds height="35.0" width="35.0" x="1100.0" y="280.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="endevent8" id="BPMNShape_endevent8">
         <omgdc:Bounds height="35.0" width="35.0" x="813.0" y="744.0"></omgdc:Bounds>
@@ -530,7 +532,7 @@ Dostavljamo Vam zapisnik namenjen ponudjacima]]></activiti:expression>
         <omgdc:Bounds height="40.0" width="40.0" x="2478.0" y="637.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="usertask19" id="BPMNShape_usertask19">
-        <omgdc:Bounds height="104.0" width="151.0" x="2530.0" y="800.0"></omgdc:Bounds>
+        <omgdc:Bounds height="104.0" width="151.0" x="2710.0" y="800.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="usertask20" id="BPMNShape_usertask20">
         <omgdc:Bounds height="96.0" width="168.0" x="2643.0" y="420.0"></omgdc:Bounds>
@@ -607,9 +609,6 @@ Dostavljamo Vam zapisnik namenjen ponudjacima]]></activiti:expression>
       <bpmndi:BPMNShape bpmnElement="exclusivegateway21" id="BPMNShape_exclusivegateway21">
         <omgdc:Bounds height="40.0" width="40.0" x="810.0" y="644.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="tajmerZaPonude3" id="BPMNShape_tajmerZaPonude3">
-        <omgdc:Bounds height="35.0" width="35.0" x="3485.0" y="641.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="servicetask11" id="BPMNShape_servicetask11">
         <omgdc:Bounds height="55.0" width="105.0" x="3170.0" y="773.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
@@ -630,6 +629,12 @@ Dostavljamo Vam zapisnik namenjen ponudjacima]]></activiti:expression>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="servicetask15" id="BPMNShape_servicetask15">
         <omgdc:Bounds height="95.0" width="105.0" x="3090.0" y="609.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="tajmerZaPonude" id="BPMNShape_tajmerZaPonude">
+        <omgdc:Bounds height="35.0" width="35.0" x="3470.0" y="639.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask16" id="BPMNShape_servicetask16">
+        <omgdc:Bounds height="75.0" width="136.0" x="2526.0" y="814.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
         <omgdi:waypoint x="36.0" y="253.0"></omgdi:waypoint>
@@ -658,10 +663,6 @@ Dostavljamo Vam zapisnik namenjen ponudjacima]]></activiti:expression>
         <omgdi:waypoint x="774.0" y="663.0"></omgdi:waypoint>
         <omgdi:waypoint x="810.0" y="664.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow27" id="BPMNEdge_flow27">
-        <omgdi:waypoint x="1003.0" y="297.0"></omgdi:waypoint>
-        <omgdi:waypoint x="1080.0" y="297.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow30" id="BPMNEdge_flow30">
         <omgdi:waypoint x="1179.0" y="162.0"></omgdi:waypoint>
         <omgdi:waypoint x="1243.0" y="162.0"></omgdi:waypoint>
@@ -686,10 +687,6 @@ Dostavljamo Vam zapisnik namenjen ponudjacima]]></activiti:expression>
       <bpmndi:BPMNEdge bpmnElement="flow53" id="BPMNEdge_flow53">
         <omgdi:waypoint x="1001.0" y="162.0"></omgdi:waypoint>
         <omgdi:waypoint x="1074.0" y="162.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow62" id="BPMNEdge_flow62">
-        <omgdi:waypoint x="1115.0" y="297.0"></omgdi:waypoint>
-        <omgdi:waypoint x="1244.0" y="297.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow63" id="BPMNEdge_flow63">
         <omgdi:waypoint x="1355.0" y="297.0"></omgdi:waypoint>
@@ -731,6 +728,14 @@ Dostavljamo Vam zapisnik namenjen ponudjacima]]></activiti:expression>
       <bpmndi:BPMNEdge bpmnElement="flow146" id="BPMNEdge_flow146">
         <omgdi:waypoint x="983.0" y="277.0"></omgdi:waypoint>
         <omgdi:waypoint x="983.0" y="180.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow170" id="BPMNEdge_flow170">
+        <omgdi:waypoint x="1003.0" y="297.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1100.0" y="297.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow171" id="BPMNEdge_flow171">
+        <omgdi:waypoint x="1135.0" y="297.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1244.0" y="297.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow77" id="BPMNEdge_flow77">
         <omgdi:waypoint x="1884.0" y="330.0"></omgdi:waypoint>
@@ -790,7 +795,7 @@ Dostavljamo Vam zapisnik namenjen ponudjacima]]></activiti:expression>
       <bpmndi:BPMNEdge bpmnElement="flow91" id="BPMNEdge_flow91">
         <omgdi:waypoint x="2498.0" y="677.0"></omgdi:waypoint>
         <omgdi:waypoint x="2498.0" y="846.0"></omgdi:waypoint>
-        <omgdi:waypoint x="2530.0" y="852.0"></omgdi:waypoint>
+        <omgdi:waypoint x="2526.0" y="851.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow92" id="BPMNEdge_flow92">
         <omgdi:waypoint x="2593.0" y="540.0"></omgdi:waypoint>
@@ -813,7 +818,7 @@ Dostavljamo Vam zapisnik namenjen ponudjacima]]></activiti:expression>
         <omgdi:waypoint x="2890.0" y="540.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow96" id="BPMNEdge_flow96">
-        <omgdi:waypoint x="2681.0" y="852.0"></omgdi:waypoint>
+        <omgdi:waypoint x="2861.0" y="852.0"></omgdi:waypoint>
         <omgdi:waypoint x="3038.0" y="850.0"></omgdi:waypoint>
         <omgdi:waypoint x="3040.0" y="677.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
@@ -828,10 +833,10 @@ Dostavljamo Vam zapisnik namenjen ponudjacima]]></activiti:expression>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow101" id="BPMNEdge_flow101">
         <omgdi:waypoint x="3410.0" y="658.0"></omgdi:waypoint>
-        <omgdi:waypoint x="3485.0" y="658.0"></omgdi:waypoint>
+        <omgdi:waypoint x="3470.0" y="656.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow102" id="BPMNEdge_flow102">
-        <omgdi:waypoint x="3520.0" y="658.0"></omgdi:waypoint>
+        <omgdi:waypoint x="3505.0" y="656.0"></omgdi:waypoint>
         <omgdi:waypoint x="3590.0" y="658.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow103" id="BPMNEdge_flow103">
@@ -864,7 +869,7 @@ Dostavljamo Vam zapisnik namenjen ponudjacima]]></activiti:expression>
         <omgdi:waypoint x="3534.0" y="780.0"></omgdi:waypoint>
         <omgdi:waypoint x="3282.0" y="684.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="52.0" width="100.0" x="3318.0" y="718.0"></omgdc:Bounds>
+          <omgdc:Bounds height="39.0" width="100.0" x="3318.0" y="718.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow114" id="BPMNEdge_flow114">
@@ -980,6 +985,10 @@ Dostavljamo Vam zapisnik namenjen ponudjacima]]></activiti:expression>
       <bpmndi:BPMNEdge bpmnElement="flow169" id="BPMNEdge_flow169">
         <omgdi:waypoint x="3931.0" y="1235.0"></omgdi:waypoint>
         <omgdi:waypoint x="3931.0" y="1290.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow172" id="BPMNEdge_flow172">
+        <omgdi:waypoint x="2662.0" y="851.0"></omgdi:waypoint>
+        <omgdi:waypoint x="2710.0" y="852.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
         <omgdi:waypoint x="222.0" y="253.0"></omgdi:waypoint>

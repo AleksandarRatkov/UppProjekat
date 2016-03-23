@@ -14,7 +14,7 @@ import org.activiti.engine.repository.Deployment;
  */
 public class ProcessDeployer {
 
-	private static final String procesJavneNabavke = "diagrams/Test.bpmn";
+	private static final String procesJavneNabavke = "diagrams/JavnaNabavka.bpmn";
 	private static final String slanjePrijave = "diagrams/SlanjePrijave.bpmn";
 	private static final String slanjePonude = "diagrams/SlanjePonuda.bpmn";
 	private static Scanner scanner;
